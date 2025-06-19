@@ -1,0 +1,65 @@
+<div class="chat-container">
+    <button id="back-to-list-btn" class="back-to-list">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </button>
+    <div class="chat-header">
+        <div class="chat-info">
+
+
+            <div class="chat-user">
+                <% if (otherUser && otherUser.photo) { %>
+                    <img src="/uploads/<%= otherUser.photo %>" alt="<%= otherUser.name %>" class="chat-user-photo">
+                    <% } else if (otherUser) { %>
+                        <div class="chat-user-photo-placeholder">
+                            <%= otherUser.name.charAt(0).toUpperCase() %>
+                        </div>
+                        <% } else { %>
+                            <div class="chat-user-photo-placeholder">
+                                ?
+                            </div>
+                            <% } %>
+                                <div>
+                                    <h3>
+                                        <%= otherUser ? otherUser.name : 'Usuário' %>
+                                    </h3>
+                                    <% if (chat && chat.job) { %>
+                                        <p class="chat-job-title">Vaga: <%= chat.job.title %>
+                                        </p>
+                                        <% } else { %>
+                                            <p class="chat-job-title">Chat administrativo</p>
+                                            <% } %>
+                                </div>
+            </div>
+
+            <div class="chat-header-actions">
+                <% if (chat && chat.status==="CLOSED" && canReactivate) { %>
+                    <button id="reactivate-chat-btn" class="btn success-btn">
+                        <i class="fas fa-unlock"></i> Reativar Chat
+                    </button>
+                    <% } else if (chat && chat.status !=="CLOSED" && canClose) { %>
+                        <button id="close-chat-btn" class="btn danger-btn">
+                            <i class="fas fa-times-circle"></i> Encerrar Chat
+                        </button>
+                        <% } else if (chat && chat.status==="CLOSED" ) { %>
+                            <span class="chat-closed-badge">
+                                <i class="fas fa-lock"></i> Chat Encerrado
+                            </span>
+                            <% } %>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-messages" id="chat-messages">
+        <div class="loading-messages">Carregando mensagens...</div>
+    </div>
+
+    <div class="chat-input">
+        <form id="message-form">
+            <textarea id="message-content"
+                placeholder="<%= (chat && chat.status === 'CLOSED') ? 'Este chat está encerrado' : 'Digite sua mensagem...' %>"
+                required <%=(chat && chat.status==='CLOSED' ) ? 'disabled' : '' %>></textarea>
+            <button type="submit" class="btn primary-btn" <%=(chat && chat.status==='CLOSED' ) ? 'disabled' : ''
+                %>>Enviar</button>
+        </form>
+    </div>
+</div>

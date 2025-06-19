@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro - If(Conecta)</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/register.css">
+</head>
+
+<body>
+  <%- include('partials/header') %>
+
+    <div class="auth-container">
+      <div class="auth-card">
+        <h2>Cadastro</h2>
+
+        <% if (error) { %>
+          <div class="error-message">
+            <%= error %>
+          </div>
+          <% } %>
+
+            <div class="tabs">
+              <div class="tab active" data-tab="student">Estudante</div>
+              <div class="tab" data-tab="employer">Empregador</div>
+            </div>
+
+            <form action="/auth/register" method="POST" id="register-form">
+              <input type="hidden" name="type" id="type" value="student">
+
+              <div class="form-group">
+                <label for="name">Nome</label>
+                <input type="text" id="name" name="name" required>
+              </div>
+              <div class="form-group hidden" id="cnpj-group">
+                <label for="cnpj">CNPJ</label>
+                <input type="text" id="cnpj" name="cnpj" placeholder="00.000.000/0000-00">
+                <button type="button" id="btn-consultar-cnpj" class="btn secondary-btn small-btn mt-2">Consultar
+                  CNPJ</button>
+                <div id="cnpj-result" class="mt-2 text-muted"></div>
+              </div>
+
+              <div class="form-group">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" required>
+              </div>
+
+              <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" required>
+              </div>
+
+              <div class="form-group">
+                <label for="confirmPassword">Confirmar Senha</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+              </div>
+
+              <button type="submit" class="btn primary-btn">Cadastrar</button>
+            </form>
+
+            <div class="auth-links">
+              <p>Já tem uma conta? <a href="/auth/login">Faça login</a></p>
+            </div>
+      </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+      <script src="/js/main.js"></script>
+      <script src="/js/validCNPJ.js"></script>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const tabs = document.querySelectorAll('.tab');
+          const typeInput = document.getElementById('type');
+          const cnpjGroup = document.getElementById('cnpj-group');
+          const cnpjInput = document.getElementById('cnpj'); // Para setar required no JS
+
+          tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+              tabs.forEach(t => t.classList.remove('active'));
+              tab.classList.add('active');
+
+              const selectedType = tab.dataset.tab;
+              typeInput.value = selectedType;
+
+              if (selectedType === 'employer') {
+                cnpjGroup.classList.remove('hidden');
+                if (cnpjInput) {
+                  cnpjInput.required = true; // CNPJ se torna obrigatório para empregador
+                }
+              } else {
+                cnpjGroup.classList.add('hidden');
+                if (cnpjInput) {
+                  cnpjInput.required = false; // CNPJ não é obrigatório para estudante
+                }
+              }
+            });
+          });
+
+          const form = document.getElementById('register-form');
+          form.addEventListener('submit', (e) => {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+              e.preventDefault();
+              alert('As senhas não coincidem. Por favor, verifique e tente novamente.');
+              return;
+            }
+
+            // Validação de CNPJ no Frontend é feita pelo validCNPJ.js ao clicar no botão.
+            // Para o submit, a validação principal será a do backend (authController.js).
+            // Se o usuário não clicou no botão "Consultar", o backend ainda pegará o erro.
+          });
+        });
+      </script>
+</body>
+
+</html>

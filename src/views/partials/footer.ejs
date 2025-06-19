@@ -1,0 +1,41 @@
+<footer>
+  <p>&copy; <%= new Date().getFullYear() %> IF Conecta. Todos os direitos reservados.</p>
+</footer>
+
+<script src="/js/badge-icons.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Inicializar os ícones Feather
+    feather.replace();
+
+    // Aplicar os ícones corretos para cada badge
+    document.querySelectorAll('.badge').forEach(badge => {
+      const badgeName = badge.getAttribute('data-badge-name');
+      const iconElement = badge.querySelector('.badge-icon-svg');
+
+      if (badgeName && iconElement) {
+        // Obter o ícone correto para esta badge
+        const iconName = getBadgeIcon(badgeName);
+
+        // Atualizar o atributo data-feather
+        iconElement.setAttribute('data-feather', iconName);
+
+        // Adicionar classe de categoria
+        if (['JavaScript', 'TypeScript', 'Python', 'Java', 'PHP', 'C#', 'Ruby', 'Swift', 'Kotlin'].includes(badgeName)) {
+          badge.classList.add('programming');
+        } else if (['HTML', 'CSS', 'React', 'Angular', 'Vue.js'].includes(badgeName)) {
+          badge.classList.add('frontend');
+        } else if (['Node.js', 'Express', 'Django', 'Flask'].includes(badgeName)) {
+          badge.classList.add('backend');
+        } else if (['SQL', 'MongoDB', 'PostgreSQL', 'MySQL'].includes(badgeName)) {
+          badge.classList.add('database');
+        } else if (['Git', 'Docker', 'AWS', 'Azure', 'Google Cloud'].includes(badgeName)) {
+          badge.classList.add('devops');
+        }
+      }
+    });
+
+    // Reinicializar os ícones Feather após as atualizações
+    feather.replace();
+  });
+</script>

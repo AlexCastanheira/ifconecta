@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar Vaga - If(Conecta)</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/vagas.css">
+  <link rel="stylesheet" href="/css/perfil.css">
+  <link rel="stylesheet" href="/css/notifications.css">
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+  <script src="/js/quill.js"></script>
+
+</head>
+
+<body>
+  <%- include('partials/header') %>
+
+    <main class="container">
+      <h2>Criar Nova Vaga</h2>
+
+      <% if (error) { %>
+        <div class="error-message">
+          <%= error %>
+        </div>
+        <% } %>
+
+          <div class="job-form-container">
+            <form id="create-job-form" class="job-form">
+              <div class="form-group">
+                <label for="title">Título da Vaga</label>
+                <input type="text" id="title" name="title" required>
+              </div>
+
+              <div class="form-group">
+                <label for="description">Descrição da Vaga</label>
+                <textarea id="description" name="description" class="quill-editor" rows="6"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="contractType">Tipo de Contrato</label>
+                <select id="contractType" name="contractType" required>
+                  <option value="">Selecione um tipo</option>
+                  <option value="estagio">Estágio</option>
+                  <option value="clt">CLT</option>
+                  <option value="pj">PJ</option>
+                  <option value="temporario">Temporário</option>
+                  <option value="freelance">Freelance</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Requisitos (Habilidades)</label>
+                <div id="requirements-container" class="badges-container">
+                </div>
+
+                <div class="add-badge-form">
+                  <h4>Selecione as habilidades necessárias</h4>
+                  <div id="skills-grid" class="skills-grid">
+                    <% availableBadges.forEach(badge=> { %>
+                      <div class="skill-badge" data-badge-name="<%= badge.name %>">
+                        <span class="badge-icon">
+                          <i data-feather="code" class="badge-icon-svg"></i>
+                        </span>
+                        <span class="badge-text">
+                          <%= badge.name %>
+                        </span>
+                      </div>
+                      <% }) %>
+                  </div>
+                </div>
+
+                <input type="hidden" id="requirements" name="requirements">
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn secondary-btn" onclick="window.history.back()">Cancelar</button>
+                <button type="submit" class="btn primary-btn">Criar Vaga</button>
+              </div>
+            </form>
+          </div>
+    </main>
+
+    <%- include('partials/footer') %>
+
+      <script src="/js/main.js"></script>
+      <script src="/js/notifications.js"></script>
+      <script src="https://unpkg.com/feather-icons"></script>
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          // Inicializar ícones do Feather Icons
+          feather.replace();
+
+          const form = document.getElementById('create-job-form');
+          const requirementsContainer = document.getElementById('requirements-container');
+          const requirementsInput = document.getElementById('requirements');
+          const skillsGrid = document.getElementById('skills-grid');
+
+          const selectedRequirements = new Set();
+
+          // Variável para armazenar a instância do Quill da descrição da vaga
+          let descriptionQuill;
+
+          // Aguarda a inicialização do Quill pelo script /js/quill.js
+          const checkQuillReady = setInterval(() => {
+            // Verifica se 'window.quillInstances' e a instância específica da descrição ('description') estão disponíveis
+            if (window.quillInstances && window.quillInstances['description']) {
+              descriptionQuill = window.quillInstances['description']; // Atribui a instância do Quill
+              clearInterval(checkQuillReady); // Limpa o intervalo assim que a instância é encontrada
+              console.log("Quill para descrição da vaga está pronto!");
+            }
+          }, 100); // Tenta a cada 100ms até que o Quill esteja pronto
+
+          // Função para atualizar a exibição dos requisitos selecionados
+          function updateRequirementsDisplay() {
+            requirementsContainer.innerHTML = ''; // Limpa o conteúdo atual
+            requirementsInput.value = JSON.stringify(Array.from(selectedRequirements)); // Atualiza o input hidden com os requisitos como JSON
+
+            if (selectedRequirements.size === 0) {
+              const emptyMessage = document.createElement('p');
+              emptyMessage.textContent = 'Nenhum requisito selecionado. Clique nas habilidades abaixo para adicionar.';
+              requirementsContainer.appendChild(emptyMessage);
+            } else {
+              selectedRequirements.forEach(req => {
+                const badge = document.createElement('div');
+                badge.className = 'badge';
+                badge.innerHTML = `
+                  ${req}
+                  <button type="button" class="remove-badge" data-badge="${req}">×</button>
+                `;
+                requirementsContainer.appendChild(badge);
+              });
+            }
+          }
+
+          // Inicializa a exibição dos requisitos ao carregar a página
+          updateRequirementsDisplay();
+
+          // Adiciona evento de clique para as habilidades na grade (skills-grid)
+          skillsGrid.addEventListener('click', (e) => {
+            const badge = e.target.closest('.skill-badge'); // Encontra o elemento '.skill-badge' mais próximo
+            if (badge) {
+              const badgeName = badge.dataset.badgeName; // Pega o nome da habilidade do atributo data-badge-name
+
+              if (!selectedRequirements.has(badgeName)) { // Verifica se a habilidade já foi selecionada
+                selectedRequirements.add(badgeName); // Adiciona a habilidade ao Set
+                badge.classList.add('selected'); // Adiciona classe 'selected' para feedback visual
+                updateRequirementsDisplay(); // Atualiza a exibição
+              }
+            }
+          });
+
+          // Adiciona evento de clique para remover requisitos da lista de selecionados
+          requirementsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-badge')) { // Verifica se o clique foi no botão de remover
+              const badgeName = e.target.dataset.badge; // Pega o nome da habilidade a ser removida
+              selectedRequirements.delete(badgeName); // Remove a habilidade do Set
+
+              // Remove a classe 'selected' da habilidade correspondente na grade
+              const badges = skillsGrid.querySelectorAll('.skill-badge');
+              badges.forEach(badge => {
+                if (badge.dataset.badgeName === badgeName) {
+                  badge.classList.remove('selected');
+                }
+              });
+
+              updateRequirementsDisplay(); // Atualiza a exibição
+            }
+          });
+
+          // Manipulador para o evento de submit do formulário
+          form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Previne o comportamento padrão de submit do formulário
+
+            if (selectedRequirements.size === 0) {
+              alert('Adicione pelo menos um requisito para a vaga.');
+              return;
+            }
+
+            // Pega o conteúdo da descrição DIRETAMENTE do editor Quill
+            let descriptionContent = '';
+            if (descriptionQuill) {
+              descriptionContent = descriptionQuill.root.innerHTML; // Pega o HTML do editor Quill
+            } else {
+              // Fallback caso o Quill não tenha sido inicializado (improvável se o script for carregado corretamente)
+              descriptionContent = document.getElementById('description').value;
+              console.warn("Quill não inicializado para a descrição da vaga. Conteúdo pode estar sem formatação.");
+            }
+
+            // Constrói o objeto com os dados do formulário
+            const formData = {
+              title: document.getElementById('title').value,
+              description: descriptionContent, // Usa o conteúdo HTML do Quill
+              contractType: document.getElementById('contractType').value,
+              requirements: Array.from(selectedRequirements) // Converte o Set para Array
+            };
+
+            try {
+              // Envia os dados via fetch API
+              const response = await fetch('/jobs', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json' // Define o cabeçalho como JSON
+                },
+                body: JSON.stringify(formData) // Converte o objeto formData para JSON
+              });
+
+              if (response.ok) {
+                const result = await response.json(); // Pega a resposta JSON do servidor
+                window.location.href = `/jobs/${result.id}`; // Redireciona para os detalhes da vaga criada
+              } else {
+                const error = await response.json(); // Pega a mensagem de erro do servidor
+                alert(`Erro: ${error.message}`);
+              }
+            } catch (error) {
+              console.error('Erro:', error);
+              alert('Ocorreu um erro ao criar a vaga.');
+            }
+          });
+        });
+      </script>
+</body>
+
+</html>

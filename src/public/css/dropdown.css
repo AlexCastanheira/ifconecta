@@ -1,0 +1,123 @@
+/* Estilos para o dropdown de configurações */
+.settings-dropdown {
+    position: relative;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.settings-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all var(--transition-speed) ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-secondary-dark);
+    /* Cor do ícone */
+}
+
+.settings-toggle:hover {
+    background-color: rgba(var(--color-primary-green), 0.1);
+}
+
+.settings-icon {
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-panel {
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    transform: translate(-50%, 10px);
+    width: 240px;
+    background-color: var(--color-background-card);
+    border-radius: var(--border-radius-default);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-speed) ease;
+    z-index: 1000;
+    margin-top: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.settings-panel.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+}
+
+.settings-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f9f9f9;
+}
+
+.settings-header h3 {
+    margin: 0;
+    font-size: 16px;
+    color: var(--color-secondary-dark);
+    font-weight: 600;
+}
+
+.settings-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.settings-item {
+    display: block;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: var(--color-secondary-dark);
+    border-bottom: 1px solid #f0f0f0;
+    /* Um pouco mais claro */
+    transition: all 0.2s ease;
+}
+
+.settings-item:last-child {
+    border-bottom: none;
+}
+
+.settings-item:hover {
+    background-color: var(--color-hover-light);
+}
+
+.settings-content {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.settings-content i {
+    margin-right: 10px;
+    color: var(--color-text-light);
+}
+
+/* Estilo para o último item (Excluir perfil) */
+.settings-item.danger {
+    color: var(--color-primary-red);
+}
+
+.settings-item.danger:hover {
+    background-color: lighten(var(--color-primary-red), 45%);
+    /* Vermelho bem claro no hover */
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .settings-panel {
+        width: 200px;
+        right: -10px;
+    }
+}

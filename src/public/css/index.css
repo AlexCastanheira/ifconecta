@@ -1,0 +1,219 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    /* Mantido do seu index.css */
+    line-height: 1.6;
+    background-color: var(--color-background-light);
+    /* Usa variável global */
+    color: var(--color-secondary-dark);
+    /* Usa variável global para texto principal */
+}
+
+/* Container para a página inicial, se necessário para centralizar ou limitar largura */
+.index-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-unit);
+    /* Adiciona padding lateral usando variável */
+}
+
+
+/* Hero Section */
+.hero {
+    /* Ajuste o gradiente para usar as cores da sua paleta, ou uma cor sólida */
+    /* Exemplo usando o verde primário como base, talvez com um tom mais escuro */
+    background: linear-gradient(to right, var(--color-primary-green-darker), var(--color-primary-green));
+    color: white;
+    /* Texto branco no fundo escuro/colorido */
+    padding: calc(var(--spacing-unit) * 4) var(--spacing-unit);
+    /* 64px 16px (aprox) */
+    text-align: center;
+    border-bottom: 5px solid var(--color-primary-green-darker);
+    /* Detalhe de design */
+}
+
+.hero-content h2 {
+    font-size: 2.8rem;
+    /* Um pouco maior para destaque */
+    margin-bottom: calc(var(--spacing-unit) * 1.5);
+    /* 24px */
+    font-weight: 700;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+    /* Sombra sutil no texto */
+}
+
+.hero-content p {
+    font-size: 1.25rem;
+    /* Um pouco maior */
+    max-width: 700px;
+    /* Um pouco mais largo */
+    margin: 0 auto calc(var(--spacing-unit) * 2);
+    /* 32px */
+    line-height: 1.7;
+}
+
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: calc(var(--spacing-unit) * 1.5);
+    /* 24px */
+    flex-wrap: wrap;
+}
+
+/* Estilização dos botões na Hero Section para corresponder aos botões globais */
+.hero .btn {
+    /* Aplicando especificidade para botões dentro da hero */
+    padding: calc(var(--spacing-unit) * 0.8) calc(var(--spacing-unit) * 1.8);
+    /* 12.8px 28.8px (aprox) */
+    font-size: 1.1rem;
+    border-radius: var(--border-radius-default);
+    /* Usa variável global */
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color var(--transition-speed), transform 0.2s;
+    border: none;
+    /* Já definido no global .btn, mas reforçando */
+    font-weight: 600;
+    text-align: center;
+    min-width: 180px;
+    /* Largura mínima para os botões */
+}
+
+.hero .btn:hover {
+    transform: translateY(-2px);
+    /* Efeito de hover global */
+}
+
+/* Botão Primário na Hero (ex: Cadastre-se) */
+.hero .primary-btn {
+    background-color: var(--color-accent-blue);
+    /* Usando azul de destaque como primário na hero */
+    color: white !important;
+    /* Garante texto branco */
+}
+
+.hero .primary-btn:hover {
+    background-color: var(--color-accent-blue-darker);
+}
+
+/* Botão Secundário na Hero (ex: Ver Vagas, se aplicável, ou Saiba Mais) */
+.hero .secondary-btn {
+    background-color: transparent;
+    color: white !important;
+    border: 2px solid white;
+    /* Borda branca para contraste */
+}
+
+.hero .secondary-btn:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    /* Efeito sutil no hover */
+}
+
+/* Features Section */
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: calc(var(--spacing-unit) * 2);
+    /* 32px */
+    padding: calc(var(--spacing-unit) * 4) var(--spacing-unit);
+    /* 64px 16px */
+    background-color: var(--color-background-card);
+    /* Fundo branco para a seção de features */
+}
+
+.feature-card {
+    background-color: #f8f9fa;
+    /* Um cinza muito claro, quase branco, para os cards */
+    padding: calc(var(--spacing-unit) * 1.8);
+    /* 28.8px */
+    border-radius: var(--border-radius-default);
+    box-shadow: var(--box-shadow-default);
+    transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+    border: 1px solid var(--color-border-light);
+    /* Borda sutil */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Centraliza o conteúdo do card */
+    text-align: center;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    /* Sombra mais pronunciada no hover */
+}
+
+.feature-card .icon {
+    /* Adiciona uma classe para o ícone, se você tiver */
+    font-size: 3rem;
+    /* Tamanho grande para o ícone */
+    color: var(--color-primary-green);
+    /* Cor do ícone */
+    margin-bottom: var(--spacing-unit);
+    /* 16px */
+}
+
+.feature-card h3 {
+    font-size: 1.6rem;
+    /* Tamanho do título do card */
+    margin-bottom: var(--spacing-unit);
+    /* 16px */
+    color: var(--color-secondary-dark);
+    /* Cor do título do card */
+    font-weight: 600;
+}
+
+.feature-card p {
+    font-size: 1rem;
+    color: var(--color-text-light);
+    /* Cor do texto do card */
+    line-height: 1.7;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+
+    /* Ponto de quebra mais comum */
+    .hero-content h2 {
+        font-size: 2.2rem;
+        /* Ajuste para telas menores */
+    }
+
+    .hero-content p {
+        font-size: 1.1rem;
+    }
+
+    .features {
+        padding: calc(var(--spacing-unit) * 3) var(--spacing-unit);
+    }
+
+    .feature-card h3 {
+        font-size: 1.4rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .hero .btn {
+        /* Mantém a regra original para botões em telas muito pequenas */
+        width: 100%;
+        margin-bottom: var(--spacing-unit);
+        /* Adiciona espaço entre botões empilhados */
+    }
+
+    .hero-buttons {
+        gap: var(--spacing-unit);
+        /* Reduz o gap quando empilhados */
+    }
+
+    .features {
+        grid-template-columns: 1fr;
+        /* Um card por linha */
+    }
+}

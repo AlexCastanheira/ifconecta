@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>If(Conecta)</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/notifications.css">
+  <link rel="stylesheet" href="/css/index.css">
+</head>
+
+<body>
+  <%- include('partials/header') %>
+
+    <main>
+      <section class="hero">
+        <div class="hero-content">
+          <h2>Conectando Estudantes e Empregadores</h2>
+          <p>Uma plataforma para facilitar o encontro entre estudantes do IFRS e oportunidades de estágio e trabalho.
+          </p>
+          <% if (!user) { %>
+            <div class="hero-buttons">
+              <a href="/auth/register" class="btn primary-btn">Cadastre-se</a>
+              <a href="/auth/login" class="btn secondary-btn">Entrar</a>
+            </div>
+            <% } %>
+        </div>
+      </section>
+
+      <section class="features">
+        <div class="feature-card">
+          <h3>Para Estudantes</h3>
+          <p>Crie seu perfil, adicione suas habilidades e receba notificações de vagas compatíveis com seu perfil.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Para Empregadores</h3>
+          <p>Publique vagas, especifique requisitos e encontre os candidatos ideais para sua empresa.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Comunicação Direta</h3>
+          <p>Chat em tempo real entre empregadores e candidatos para facilitar o processo de seleção.</p>
+        </div>
+      </section>
+    </main>
+
+    <%- include('partials/footer') %>
+
+      <script src="/js/main.js"></script>
+      <script src="/js/notifications.js"></script>
+</body>
+
+</html>

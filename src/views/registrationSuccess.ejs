@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Realizado - If(Conecta)</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+</head>
+
+<body>
+    <%- include('partials/header') %>
+
+        <main class="container auth-container">
+            <div class="auth-card">
+                <h2>Registro Realizado!</h2>
+
+                <% if (type==='student' ) { %>
+                    <p>Obrigado por se registrar no IF Conecta!</p>
+                    <p>Para ativar sua conta, por favor, verifique a sua caixa de entrada e clique no link de
+                        confirmação que enviamos para <strong>
+                            <%= email %>
+                        </strong>.</p>
+                    <p>Este link é válido por 24 horas. Caso não receba, verifique sua pasta de spam.</p>
+                    <div class="auth-links mt-4">
+                        <a href="/auth/login" class="btn primary-btn">Ir para o Login</a>
+                    </div>
+                    <% } else if (type==='employer' ) { %>
+                        <p>Obrigado por se registrar no IF Conecta!</p>
+                        <p>Sua conta de empregador foi criada e está aguardando a aprovação de um administrador. Você
+                            será notificado assim que sua conta for ativada.</p>
+                        <div class="auth-links mt-4">
+                            <a href="/" class="btn secondary-btn">Voltar à Página Inicial</a>
+                        </div>
+                        <% } else { %>
+                            <p>Registro realizado com sucesso!</p>
+                            <p>Você já pode acessar sua conta.</p>
+                            <div class="auth-links mt-4">
+                                <a href="/auth/login" class="btn primary-btn">Ir para o Login</a>
+                            </div>
+                            <% } %>
+            </div>
+        </main>
+
+        <%- include('partials/footer') %>
+            <script src="/js/main.js"></script>
+            <script src="/js/notifications.js"></script>
+</body>
+
+</html>

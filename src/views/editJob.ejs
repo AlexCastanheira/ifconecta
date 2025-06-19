@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Vaga - If(Conecta)</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/vagas.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <script src="/js/quill.js"></script>
+
+</head>
+
+<body>
+    <%- include('partials/header') %>
+
+        <main class="container">
+            <div class="profile-header-actions">
+                <h2>Editar Vaga</h2>
+                <a href="/jobs/<%= job.id %>" class="btn secondary-btn">Voltar para Detalhes</a>
+            </div>
+
+            <% if (error) { %>
+                <div class="error-message">
+                    <%= error %>
+                </div>
+                <% } %>
+
+                    <div class="job-form-container">
+                        <form action="/jobs/<%= job.id %>" method="POST">
+                            <input type="hidden" name="_method" value="PUT">
+
+                            <div class="form-group">
+                                <label for="title">Título da Vaga</label>
+                                <input type="text" id="title" name="title" value="<%= job.title %>" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="description">Descrição da Vaga</label>
+                                <textarea id="description" name="description" class="quill-editor" rows="6"
+                                    required><%= job.description %></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="contractType">Tipo de Contrato</label>
+                                <select id="contractType" name="contractType" required>
+                                    <option value="">Selecione um tipo</option>
+                                    <option value="estagio" <%=job.contractType==='estagio' ? 'selected' : '' %>>Estágio
+                                    </option>
+                                    <option value="clt" <%=job.contractType==='clt' ? 'selected' : '' %>>CLT</option>
+                                    <option value="pj" <%=job.contractType==='pj' ? 'selected' : '' %>>PJ</option>
+                                    <option value="temporario" <%=job.contractType==='temporario' ? 'selected' : '' %>
+                                        >Temporário</option>
+                                    <option value="freelance" <%=job.contractType==='freelance' ? 'selected' : '' %>
+                                        >Freelance</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Requisitos (Habilidades)</label>
+                                <div id="requirements-container" class="requirements-container">
+                                    <% job.requirements.forEach(req=> { %>
+                                        <div class="badge">
+                                            <%= req.name %>
+                                                <button type="button" class="remove-badge"
+                                                    data-badge="<%= req.name %>">×</button>
+                                        </div>
+                                        <% }) %>
+                                </div>
+
+                                <div class="badge-selector">
+                                    <select id="badge-select">
+                                        <option value="">Selecione uma habilidade</option>
+                                        <% availableBadges.forEach(badge=> { %>
+                                            <option value="<%= badge.name %>">
+                                                <%= badge.name %>
+                                            </option>
+                                            <% }) %>
+                                    </select>
+                                    <button type="button" id="add-badge" class="btn secondary-btn">Adicionar</button>
+                                </div>
+
+                                <input type="hidden" id="requirements" name="requirements">
+                            </div>
+
+                            <div class="form-actions">
+                                <a href="/jobs/<%= job.id %>" class="btn secondary-btn">Cancelar</a>
+                                <button type="submit" class="btn primary-btn">Salvar Alterações</button>
+                            </div>
+                        </form>
+                    </div>
+        </main>
+
+        <%- include('partials/footer') %>
+
+            <script src="/js/main.js"></script>
+            <script src="/js/notifications.js"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const form = document.querySelector('form');
+                    const badgeSelect = document.getElementById('badge-select');
+                    const addBadgeBtn = document.getElementById('add-badge');
+                    const requirementsContainer = document.getElementById('requirements-container');
+                    const requirementsInput = document.getElementById('requirements');
+
+                    // Inicializar com os requisitos existentes
+                    const selectedRequirements = new Set();
+
+                    // Adicionar os requisitos existentes ao Set
+                    document.querySelectorAll('.badge').forEach(badge => {
+                        const badgeName = badge.textContent.trim().replace('×', '').trim();
+                        selectedRequirements.add(badgeName);
+                    });
+
+                    // Atualizar o input hidden com os requisitos
+                    updateRequirementsInput();
+
+                    // Adicionar badge aos requisitos
+                    addBadgeBtn.addEventListener('click', () => {
+                        const badgeName = badgeSelect.value;
+
+                        if (badgeName && !selectedRequirements.has(badgeName)) {
+                            selectedRequirements.add(badgeName);
+
+                            const badge = document.createElement('div');
+                            badge.className = 'badge';
+                            badge.innerHTML = `
+            ${badgeName}
+            <button type="button" class="remove-badge" data-badge="${badgeName}">×</button>
+          `;
+                            requirementsContainer.appendChild(badge);
+
+                            // Adicionar event listener para o botão de remover
+                            const removeBtn = badge.querySelector('.remove-badge');
+                            removeBtn.addEventListener('click', () => {
+                                selectedRequirements.delete(badgeName);
+                                badge.remove();
+                                updateRequirementsInput();
+                            });
+
+                            updateRequirementsInput();
+                        }
+                    });
+
+                    // Adicionar event listeners para os botões de remover existentes
+                    document.querySelectorAll('.remove-badge').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const badgeName = e.target.dataset.badge;
+                            selectedRequirements.delete(badgeName);
+                            e.target.parentElement.remove();
+                            updateRequirementsInput();
+                        });
+                    });
+
+                    // Atualizar o input hidden com os requisitos
+                    function updateRequirementsInput() {
+                        requirementsInput.value = JSON.stringify(Array.from(selectedRequirements));
+                    }
+
+                    // Antes de enviar o formulário, garantir que o input hidden está atualizado
+                    form.addEventListener('submit', (e) => {
+                        if (selectedRequirements.size === 0) {
+                            e.preventDefault();
+                            alert('Adicione pelo menos um requisito para a vaga.');
+                            return;
+                        }
+
+                        updateRequirementsInput();
+                    });
+                });
+            </script>
+</body>
+
+</html>

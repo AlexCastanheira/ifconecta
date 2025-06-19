@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatórios e Análises - If(Conecta)</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/reports.css">
+  <link rel="stylesheet" href="/css/notifications.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body>
+  <%- include('partials/header') %>
+
+    <main class="container">
+      <div class="admin-container">
+        <div class="admin-header">
+          <h1>Relatórios e Análises</h1>
+          <a href="/admin/dashboard" class="btn secondary-btn">Voltar ao Dashboard</a>
+        </div>
+
+        <!-- Formulário de pesquisa por data -->
+        <div class="report-section">
+          <h2>Filtrar por período</h2>
+          <form action="/admin/reports" method="GET" class="date-filter-form">
+            <div class="date-inputs">
+              <div class="form-group">
+                <label for="startDate">Data inicial:</label>
+                <input type="date" id="startDate" name="startDate" value="<%= startDate %>" class="form-control">
+              </div>
+              <div class="form-group">
+                <label for="endDate">Data final:</label>
+                <input type="date" id="endDate" name="endDate" value="<%= endDate %>" class="form-control">
+              </div>
+            </div>
+            <button type="submit" class="btn primary-btn">Filtrar</button>
+          </form>
+        </div>
+
+        <!-- Resumo do período -->
+        <div class="report-section">
+          <h2>Resumo do período (<%= formattedStartDate %> a <%= formattedEndDate %>)</h2>
+          <div class="summary-cards">
+            <div class="summary-card">
+              <h3>Vagas criadas</h3>
+              <div class="summary-value">
+                <%= periodSummary.jobsCount %>
+              </div>
+            </div>
+            <div class="summary-card">
+              <h3>Novos alunos</h3>
+              <div class="summary-value">
+                <%= periodSummary.studentsCount %>
+              </div>
+            </div>
+            <div class="summary-card">
+              <h3>Novos empregadores</h3>
+              <div class="summary-value">
+                <%= periodSummary.employersCount %>
+              </div>
+            </div>
+            <div class="summary-card">
+              <h3>Candidaturas</h3>
+              <div class="summary-value">
+                <%= periodSummary.applicationsCount %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção 1: Requisitos mais buscados pelas vagas -->
+        <div class="report-section">
+          <h2>Requisitos mais buscados pelas vagas</h2>
+          <div class="data-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Requisito</th>
+                  <th>Quantidade de Vagas</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (topRequirements && topRequirements.length> 0) { %>
+                  <% topRequirements.forEach(function(req) { %>
+                    <tr>
+                      <td>
+                        <%= req.name %>
+                      </td>
+                      <td>
+                        <%= req.count %>
+                      </td>
+                    </tr>
+                    <% }); %>
+                      <% } else { %>
+                        <tr>
+                          <td colspan="2" class="empty-data">Nenhum dado disponível para o período selecionado</td>
+                        </tr>
+                        <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Seção 2: Habilidades mais adicionadas por alunos -->
+        <div class="report-section">
+          <h2>Habilidades mais adicionadas por alunos</h2>
+          <div class="data-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Habilidade</th>
+                  <th>Quantidade de Alunos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (topStudentSkills && topStudentSkills.length> 0) { %>
+                  <% topStudentSkills.forEach(function(skill) { %>
+                    <tr>
+                      <td>
+                        <%= skill.name %>
+                      </td>
+                      <td>
+                        <%= skill.count %>
+                      </td>
+                    </tr>
+                    <% }); %>
+                      <% } else { %>
+                        <tr>
+                          <td colspan="2" class="empty-data">Nenhum dado disponível para o período selecionado</td>
+                        </tr>
+                        <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Seção 3: Relação entre requisitos e habilidades -->
+        <div class="report-section">
+          <h2>Relação entre requisitos de vagas e habilidades de alunos</h2>
+          <div class="data-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Habilidade</th>
+                  <th>Vagas que exigem</th>
+                  <th>Alunos que possuem</th>
+                  <th>% de alunos com a habilidade</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (skillsMatchAnalysis && skillsMatchAnalysis.length> 0) { %>
+                  <% skillsMatchAnalysis.forEach(function(item) { %>
+                    <tr>
+                      <td>
+                        <%= item.name %>
+                      </td>
+                      <td>
+                        <%= item.job_count %>
+                      </td>
+                      <td>
+                        <%= item.student_count %>
+                      </td>
+                      <td>
+                        <%= item.student_percentage %>%
+                      </td>
+                    </tr>
+                    <% }); %>
+                      <% } else { %>
+                        <tr>
+                          <td colspan="4" class="empty-data">Nenhum dado disponível para o período selecionado</td>
+                        </tr>
+                        <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Seção 4: Taxa de aplicação por vaga -->
+        <div class="report-section">
+          <h2>Vagas com mais candidaturas</h2>
+          <div class="data-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Vaga</th>
+                  <th>Candidaturas</th>
+                  <th>Data de Criação</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (applicationRates && applicationRates.length> 0) { %>
+                  <% applicationRates.forEach(function(item) { %>
+                    <tr>
+                      <td><a href="/jobs/<%= item.job_id %>">
+                          <%= item.title %>
+                        </a></td>
+                      <td>
+                        <%= item.application_count %>
+                      </td>
+                      <td>
+                        <%= new Date(item.job_date).toLocaleDateString('pt-BR') %>
+                      </td>
+                    </tr>
+                    <% }); %>
+                      <% } else { %>
+                        <tr>
+                          <td colspan="3" class="empty-data">Nenhum dado disponível para o período selecionado</td>
+                        </tr>
+                        <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <%- include('partials/footer') %>
+
+      <script src="/js/main.js"></script>
+      <script src="/js/notifications.js"></script>
+</body>
+
+</html>

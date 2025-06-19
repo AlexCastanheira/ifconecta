@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    <%= job.title %> - If(Conecta)
+  </title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/vagas.css">
+  <link rel="stylesheet" href="/css/notifications.css">
+  <link rel="stylesheet" href="/css/admin.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link href="https://cdn.quilljs.com/1.3.6/quill.core.css" rel="stylesheet">
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+
+</head>
+
+<body>
+  <%- include('partials/header') %>
+
+    <div class="container job-details-container">
+      <div class="job-details-header">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h1 class="job-details-title">
+            <%= job.title %>
+          </h1>
+          <div class="job-status <%= job.status ? 'open' : 'closed' %>">
+            <%= job.status ? 'Aberta' : 'Encerrada' %>
+          </div>
+        </div>
+
+        <div class="job-details-company">
+          <% if (job.employer && job.employer.photo) { %>
+            <img src="/uploads/<%= job.employer.photo %>" alt="<%= job.employer.name %>">
+            <% } else { %>
+              <img src="/uploads/foto_padrao.png" alt="Empresa">
+              <% } %>
+                <div>
+                  <div class="job-details-company-name">
+                    <%= job.employer.name %>
+                  </div>
+                  <div class="text-muted">
+                    <%= new Date(job.createdAt).toLocaleDateString('pt-BR') %>
+                  </div>
+                </div>
+        </div>
+      </div>
+
+      <div class="job-details-meta">
+        <div class="job-meta-item">
+          <i class="fas fa-briefcase"></i>
+          <span>
+            <%= job.contractType %>
+          </span>
+        </div>
+      </div>
+
+      <% if (isStudent && !job.status) { %>
+        <div class="applications-closed-alert">
+          <i data-feather="alert-circle"></i>
+          <span>As candidaturas para esta vaga foram encerradas.</span>
+        </div>
+        <% } %>
+
+          <div class="job-details-description">
+            <h2 class="job-details-section-title">Descrição</h2>
+            <div class="job-description-content">
+              <%- job.description %>
+            </div>
+          </div>
+
+          <% if (job.requirements && job.requirements.length> 0) { %>
+            <div class="job-details-requirements">
+              <h2 class="job-details-section-title">Requisitos</h2>
+              <div class="badges-container">
+                <% job.requirements.forEach(req=> { %>
+                  <span class="badge" data-badge-name="<%= req.name %>">
+                    <i class="badge-icon-svg" data-feather="code"></i>
+                    <%= req.name %>
+                  </span>
+                  <% }) %>
+              </div>
+            </div>
+            <% } %>
+
+              <div class="job-details-actions">
+                <% if (isStudent) { %>
+                  <% if (hasApplied) { %>
+                    <button class="btn btn-primary" disabled>Você já se candidatou</button>
+                    <button class="btn btn-primary" id="cancelApplication"
+                      data-application-id="<%= applicationId %>">Cancelar candidatura</button>
+                    <% } else { %>
+                      <button class="btn btn-primary" id="applyButton" data-job-id="<%= job.id %>" <%=!job.status
+                        ? 'disabled' : '' %>>
+                        Candidatar-se à vaga
+                      </button>
+                      <% } %>
+                        <% } %>
+
+                          <% if (isOwner) { %>
+                            <a href="/jobs/<%= job.id %>/edit" class="btn btn-primary">Editar vaga</a>
+                            <button class="btn btn-primary" id="deleteJob" data-job-id="<%= job.id %>">Excluir
+                              vaga</button>
+
+                            <% if (job.status) { %>
+                              <form action="/jobs/<%= job.id %>/close" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-primary">Encerrar candidaturas</button>
+                              </form>
+                              <% } else { %>
+                                <form action="/jobs/<%= job.id %>/reopen" method="POST" class="d-inline">
+                                  <button type="submit" class="btn btn-primary">Reabrir candidaturas</button>
+                                </form>
+                                <% } %>
+                                  <% } %>
+              </div>
+
+              <% if (isOwner && job.applications && job.applications.length> 0) { %>
+                <div class="job-applicants">
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                    <h2 class="job-details-section-title" style="margin: 0;">
+                      Candidatos (<%= job.applications.length %>)
+                    </h2>
+                    <input type="search" placeholder="Buscar candidato"
+                      style="padding: 0.4rem 0.6rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px;" />
+                  </div>
+
+                  <% job.applications.forEach(application=> { %>
+                    <div class="applicant-card">
+                      <% if (application.student.photo) { %>
+                        <img src="/uploads/<%= application.student.photo %>" alt="<%= application.student.name %>"
+                          class="applicant-photo" />
+                        <% } else { %>
+                          <img src="/placeholder.svg?height=50&width=50&query=person" class="applicant-photo" />
+                          <% } %>
+
+                            <div class="applicant-info">
+                              <div class="applicant-name">
+                                <%= application.student.name %>
+                              </div>
+                              <div class="applicant-email">
+                                <%= application.student.email %>
+                              </div>
+                              <div class="mt-2">
+                                <span class="applicant-status <%= application.status.toLowerCase() %>">
+                                  <%= application.status==='PENDING' ? 'Pendente' : application.status==='ACCEPTED'
+                                    ? 'Aceito' : 'Recusado' %>
+                                </span>
+                                <small class="text-muted">
+                                  Candidatura em <%= new Date(application.createdAt).toLocaleDateString('pt-BR') %>
+                                </small>
+                              </div>
+                            </div>
+
+                            <div class="actions-cell">
+                              <% if (application.status==='PENDING' ) { %>
+                                <button class="btn small-btn unblock-btn toggle-status-btn update-application"
+                                  data-application-id="<%= application.id %>" data-status="ACCEPTED" title="Aceitar">
+                                  <i class="fas fa-check"></i>
+                                </button>
+                                <button class="btn small-btn block-btn toggle-status-btn update-application"
+                                  data-application-id="<%= application.id %>" data-status="REJECTED" title="Recusar">
+                                  <i class="fas fa-ban"></i>
+                                </button>
+                                <% } else if (application.status==='REJECTED' ) { %>
+                                  <button class="btn small-btn unblock-btn toggle-status-btn revert-application"
+                                    data-application-id="<%= application.id %>" title="Reconsiderar">
+                                    <i class="fas fa-unlock"></i>
+                                  </button>
+                                  <% } %>
+
+                                    <a href="/users/view/<%= application.student.id %>" class="btn small-btn view-btn"
+                                      title="Ver Perfil">
+                                      <i class="fas fa-eye"></i>
+                                    </a>
+
+                                    <button class="btn small-btn chat-btn start-chat-btn"
+                                      data-student-id="<%= application.studentId %>" data-job-id="<%= job.id %>"
+                                      title="Iniciar Chat">
+                                      <i class="fas fa-comment"></i>
+                                    </button>
+                            </div>
+                    </div>
+                    <% }) %>
+                </div>
+                <% } %>
+
+    </div>
+
+    <%- include('partials/footer') %>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          // Botão de candidatura
+          const applyButton = document.getElementById('applyButton');
+          if (applyButton) {
+            applyButton.addEventListener('click', function () {
+              const jobId = this.getAttribute('data-job-id');
+
+              fetch(`/jobs/${jobId}/apply`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+              })
+                .then(response => response.json())
+                .then(data => {
+                  if (data.id) {
+                    // Sucesso
+                    window.location.reload();
+                  } else {
+                    // Erro
+                    alert(data.message || 'Erro ao se candidatar à vaga.');
+                  }
+                })
+                .catch(error => {
+                  console.error('Erro:', error);
+                  alert('Erro ao se candidatar à vaga.');
+                });
+            });
+          }
+
+          // Botão de cancelar candidatura
+          const cancelButton = document.getElementById('cancelApplication');
+          if (cancelButton) {
+            cancelButton.addEventListener('click', function () {
+              if (confirm('Tem certeza que deseja cancelar sua candidatura?')) {
+                const applicationId = this.getAttribute('data-application-id');
+
+                fetch(`/jobs/applications/${applicationId}`, {
+                  method: 'DELETE'
+                })
+                  .then(response => response.json())
+                  .then(data => {
+                    if (data.message) {
+                      // Sucesso
+                      window.location.reload();
+                    } else {
+                      // Erro
+                      alert(data.message || 'Erro ao cancelar candidatura.');
+                    }
+                  })
+                  .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao cancelar candidatura.');
+                  });
+              }
+            });
+          }
+
+          // Botão de excluir vaga
+          const deleteButton = document.getElementById('deleteJob');
+          if (deleteButton) {
+            deleteButton.addEventListener('click', function () {
+              if (confirm('Tem certeza que deseja excluir esta vaga? Esta ação não pode ser desfeita.')) {
+                const jobId = this.getAttribute('data-job-id');
+
+                fetch(`/jobs/${jobId}`, {
+                  method: 'DELETE'
+                })
+                  .then(response => response.json())
+                  .then(data => {
+                    if (data.message) {
+                      // Sucesso
+                      window.location.href = '/jobs/list';
+                    } else {
+                      // Erro
+                      alert(data.message || 'Erro ao excluir vaga.');
+                    }
+                  })
+                  .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao excluir vaga.');
+                  });
+              }
+            });
+          }
+
+          // Botões de atualizar status da candidatura
+          const updateButtons = document.querySelectorAll('.update-application');
+          updateButtons.forEach(button => {
+            button.addEventListener('click', function () {
+              const applicationId = this.getAttribute('data-application-id');
+              const status = this.getAttribute('data-status');
+
+              fetch(`/jobs/applications/${applicationId}/status`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status })
+              })
+                .then(response => response.json())
+                .then(data => {
+                  if (data.id) {
+                    // Sucesso
+                    window.location.reload();
+                  } else {
+                    // Erro
+                    alert(data.message || 'Erro ao atualizar status da candidatura.');
+                  }
+                })
+                .catch(error => {
+                  console.error('Erro:', error);
+                  alert('Erro ao atualizar status da candidatura.');
+                });
+            });
+          });
+
+          // Botões de reverter status da candidatura
+          const revertButtons = document.querySelectorAll('.revert-application');
+          revertButtons.forEach(button => {
+            button.addEventListener('click', function () {
+              const applicationId = this.getAttribute('data-application-id');
+
+              fetch(`/jobs/applications/${applicationId}/revert`, {
+                method: 'POST'
+              })
+                .then(response => response.json())
+                .then(data => {
+                  if (data.id) {
+                    // Sucesso
+                    window.location.reload();
+                  } else {
+                    // Erro
+                    alert(data.message || 'Erro ao reverter status da candidatura.');
+                  }
+                })
+                .catch(error => {
+                  console.error('Erro:', error);
+                  alert('Erro ao reverter status da candidatura.');
+                });
+            });
+          });
+
+          // Botões de iniciar chat
+          const chatButtons = document.querySelectorAll('.start-chat-btn');
+          chatButtons.forEach(button => {
+            button.addEventListener('click', function () {
+              const studentId = this.getAttribute('data-student-id');
+              const jobId = this.getAttribute('data-job-id');
+
+              fetch('/chat/start', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ studentId, jobId })
+              })
+                .then(response => response.json())
+                .then(data => {
+                  if (data.chatId) {
+                    // Sucesso
+                    window.location.href = `/chat/interface?chatId=${data.chatId}`;
+                  } else {
+                    // Erro
+                    alert(data.message || 'Erro ao iniciar chat.');
+                  }
+                })
+                .catch(error => {
+                  console.error('Erro:', error);
+                  alert('Erro ao iniciar chat.');
+                });
+            });
+          });
+        });
+      </script>
+</body>
+
+</html>
+
+<script src="/js/main.js"></script>
+<script src="/js/notifications.js"></script>
+<script src="/js/jobSearch.js"></script>

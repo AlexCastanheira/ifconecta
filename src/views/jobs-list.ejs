@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Vagas - If(Conecta)</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/vagas.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body>
+    <%- include('partials/header') %>
+
+        <div class="admin-container container">
+            <div class="admin-header">
+                <h1>Gerenciar Vagas</h1>
+                <a href="/admin/dashboard" class="btn secondary-btn">Voltar ao Dashboard</a>
+            </div>
+
+            <div class="search-filter">
+                <input type="text" id="jobSearch" placeholder="Buscar vaga..." class="search-input">
+            </div>
+
+            <div class="admin-table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Empresa</th>
+                            <th>Candidaturas</th>
+                            <th>Data de Publicação</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (jobs.length===0) { %>
+                            <tr>
+                                <td colspan="6" class="empty-table">Nenhuma vaga encontrada</td>
+                            </tr>
+                            <% } else { %>
+                                <% jobs.forEach(job=> { %>
+                                    <tr data-job-id="<%= job.id %>" class="job-row">
+                                        <td>
+                                            <%= job.id %>
+                                        </td>
+                                        <td>
+                                            <%= job.title %>
+                                        </td>
+                                        <td>
+                                            <%= job.employer.companyName || job.employer.name %>
+                                        </td>
+                                        <td>
+                                            <%= job.applications.length %>
+                                        </td>
+                                        <td>
+                                            <%= new Date(job.createdAt).toLocaleDateString('pt-BR') %>
+                                        </td>
+                                        <td class="actions-cell">
+                                            <a href="/jobs/<%= job.id %>" class="btn small-btn view-btn"
+                                                title="Ver Vaga">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="/users/view/<%= job.employerId %>"
+                                                class="btn small-btn employer-btn" title="Ver Empregador">
+                                                <i class="fas fa-building"></i>
+                                            </a>
+                                            <button class="btn small-btn delete-btn" data-job-id="<%= job.id %>"
+                                                title="Excluir">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <%- include('partials/footer') %>
+
+            <script src="/js/main.js"></script>
+            <script src="/js/notifications.js"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Busca de vagas
+                    const searchInput = document.getElementById('jobSearch');
+                    searchInput.addEventListener('input', function () {
+                        const searchTerm = this.value.toLowerCase();
+                        const rows = document.querySelectorAll('.job-row');
+
+                        rows.forEach(row => {
+                            const title = row.children[1].textContent.toLowerCase();
+                            const company = row.children[2].textContent.toLowerCase();
+
+                            if (title.includes(searchTerm) || company.includes(searchTerm)) {
+                                row.style.display = '';
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+                    });
+
+                    // Deletar vaga
+                    document.querySelectorAll('.delete-btn').forEach(btn => {
+                        btn.addEventListener('click', async function () {
+                            if (!confirm('Tem certeza que deseja excluir esta vaga?')) return;
+
+                            const jobId = this.dataset.jobId;
+                            try {
+                                const response = await fetch(`/admin/jobs/${jobId}`, {
+                                    method: 'DELETE'
+                                });
+
+                                const data = await response.json();
+                                if (data.success) {
+                                    alert('Vaga excluída com sucesso!');
+                                    document.querySelector(`tr[data-job-id="${jobId}"]`).remove();
+                                } else {
+                                    alert('Erro ao excluir vaga: ' + data.message);
+                                }
+                            } catch (error) {
+                                console.error('Erro:', error);
+                                alert('Erro ao excluir vaga');
+                            }
+                        });
+                    });
+                });
+            </script>
+</body>
+
+</html>
+
+<script src="/js/main.js"></script>
+<script src="/js/notifications.js"></script>

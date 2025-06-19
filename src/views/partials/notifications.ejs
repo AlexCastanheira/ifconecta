@@ -1,0 +1,41 @@
+<div class="notifications-dropdown">
+  <button id="notifications-toggle" class="notifications-toggle">
+    <span class="notifications-icon">🔔</span>
+    <span id="notification-count" class="notification-count <%= unreadCount > 0 ? 'has-notifications' : '' %>"
+      data-count="<%= unreadCount %>">
+      <%= unreadCount %>
+    </span>
+  </button>
+
+  <div id="notifications-panel" class="notifications-panel">
+    <div class="notifications-header">
+      <h3>Notificações</h3>
+      <button id="mark-all-read" class="mark-all-read">Marcar todas como lidas</button>
+    </div>
+
+    <div class="notifications-list">
+      <% if (notifications && notifications.length> 0) { %>
+        <% notifications.forEach(notification=> { %>
+          <div class="notification-item <%= notification.read ? '' : 'unread' %>" data-id="<%= notification.id %>"
+            data-type="<%= notification.type %>" data-related-id="<%= notification.relatedId %>">
+            <div class="notification-content">
+              <%= notification.message %>
+            </div>
+            <div class="notification-time">
+              <%= new Date(notification.createdAt).toLocaleString('pt-BR', { day: '2-digit' , month: '2-digit' ,
+                year: 'numeric' , hour: '2-digit' , minute: '2-digit' }) %>
+            </div>
+          </div>
+          <% }) %>
+            <% } else { %>
+              <div class="no-notifications">
+                Nenhuma notificação no momento.
+              </div>
+              <% } %>
+    </div>
+
+    <div class="notifications-footer">
+      <a href="/notifications/all" class="view-all-notifications">Ver todas</a>
+    </div>
+  </div>
+</div>

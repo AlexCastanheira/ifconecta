@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mensagens - If(Conecta)</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/chat.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body>
+    <%- include('partials/header') %>
+
+        <main class="container chat-interface-container">
+            <!-- Painel esquerdo: Lista de chats -->
+            <div class="chat-list-panel">
+                <div class="chat-list-header">
+                    <h2>Conversas</h2>
+                    <div class="chat-search">
+                        <input type="text" id="chat-search-input" placeholder="Buscar conversa...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+
+                <div class="chats-list" id="chats-list">
+                    <% if (chats && chats.length> 0) { %>
+                        <% chats.forEach(chat=> { %>
+                            <div class="chat-item <%= chat.id === selectedChatId ? 'active' : '' %> <%= chat.unreadCount > 0 ? 'unread' : '' %> <%= chat.status === 'CLOSED' ? 'closed' : '' %>"
+                                data-chat-id="<%= chat.id %>" data-chat-url="/chat/<%= chat.id %>">
+                                <div class="chat-item-user">
+                                    <% if (userType==='employer' || (userType==='admin' && chat.student)) { %>
+                                        <% if (chat.student && chat.student.photo) { %>
+                                            <img src="/uploads/<%= chat.student.photo %>" alt="<%= chat.student.name %>"
+                                                class="chat-user-photo">
+                                            <% } else if (chat.student) { %>
+                                                <div class="chat-user-photo-placeholder">
+                                                    <%= chat.student.name.charAt(0).toUpperCase() %>
+                                                </div>
+                                                <% } %>
+                                                    <div>
+                                                        <h3>
+                                                            <%= chat.student ? chat.student.name : 'Usuário' %>
+                                                        </h3>
+                                                        <p class="chat-job-title">
+                                                            <% if (chat.job) { %>
+                                                                Vaga: <%= chat.job.title %>
+                                                                    <% } else { %>
+                                                                        Chat administrativo
+                                                                        <% } %>
+                                                        </p>
+                                                    </div>
+                                                    <% } else { %>
+                                                        <% if (chat.employer && chat.employer.photo) { %>
+                                                            <img src="/uploads/<%= chat.employer.photo %>"
+                                                                alt="<%= chat.employer.name %>" class="chat-user-photo">
+                                                            <% } else if (chat.employer) { %>
+                                                                <div class="chat-user-photo-placeholder">
+                                                                    <%= chat.employer.name.charAt(0).toUpperCase() %>
+                                                                </div>
+                                                                <% } %>
+                                                                    <div>
+                                                                        <h3>
+                                                                            <%= chat.employer ? chat.employer.name
+                                                                                : 'Usuário' %>
+                                                                        </h3>
+                                                                        <p class="chat-job-title">
+                                                                            <% if (chat.job) { %>
+                                                                                Vaga: <%= chat.job.title %>
+                                                                                    <% } else { %>
+                                                                                        Chat administrativo
+                                                                                        <% } %>
+                                                                        </p>
+                                                                    </div>
+                                                                    <% } %>
+                                </div>
+
+                                <div class="chat-item-preview">
+                                    <% if (chat.messages && chat.messages.length> 0) { %>
+                                        <p class="chat-last-message">
+                                            <% if (chat.messages[0].isSystemMessage) { %>
+                                                <i>
+                                                    <%= chat.messages[0].content.length> 50 ?
+                                                        chat.messages[0].content.substring(0, 50) + '...' :
+                                                        chat.messages[0].content %>
+                                                </i>
+                                                <% } else { %>
+                                                    <%= chat.messages[0].content.length> 50 ?
+                                                        chat.messages[0].content.substring(0, 50) + '...' :
+                                                        chat.messages[0].content %>
+                                                        <% } %>
+                                        </p>
+                                        <p class="chat-time">
+                                            <%= new Date(chat.messages[0].createdAt).toLocaleDateString() %>
+                                        </p>
+                                        <% } else { %>
+                                            <p class="chat-last-message">Nenhuma mensagem ainda</p>
+                                            <% } %>
+
+                                                <% if (chat.unreadCount> 0) { %>
+                                                    <span class="chat-unread-count">
+                                                        <%= chat.unreadCount %>
+                                                    </span>
+                                                    <% } %>
+
+                                                        <% if (chat.status==='CLOSED' ) { %>
+                                                            <span class="chat-status-badge closed">Encerrado</span>
+                                                            <% } %>
+                                </div>
+                            </div>
+                            <% }) %>
+                                <% } else { %>
+                                    <div class="no-chats">
+                                        <p>Você ainda não tem nenhum chat.</p>
+                                        <% if (userType==='student' ) { %>
+                                            <p>Candidate-se a vagas para que os empregadores possam iniciar um chat com
+                                                você.</p>
+                                            <a href="/jobs/list" class="btn primary-btn">Ver Vagas Disponíveis</a>
+                                            <% } else if (userType==='employer' ) { %>
+                                                <p>Inicie um chat com candidatos às suas vagas.</p>
+                                                <a href="/jobs/list" class="btn primary-btn">Ver Minhas Vagas</a>
+                                                <% } else { %>
+                                                    <p>Você pode iniciar chats com estudantes ou empregadores.</p>
+                                                    <% } %>
+                                    </div>
+                                    <% } %>
+                </div>
+            </div>
+
+            <!-- Painel direito: Chat selecionado -->
+            <div class="chat-panel" id="chat-panel">
+                <% if (selectedChat) { %>
+                    <div class="chat-container">
+                        <div class="chat-header">
+                            <div class="chat-info">
+                                <div class="chat-user">
+                                    <% if (otherUser && otherUser.photo) { %>
+                                        <img src="/uploads/<%= otherUser.photo %>" alt="<%= otherUser.name %>"
+                                            class="chat-user-photo">
+                                        <% } else if (otherUser) { %>
+                                            <div class="chat-user-photo-placeholder">
+                                                <%= otherUser.name.charAt(0).toUpperCase() %>
+                                            </div>
+                                            <% } else { %>
+                                                <div class="chat-user-photo-placeholder">
+                                                    ?
+                                                </div>
+                                                <% } %>
+                                                    <div>
+                                                        <h3>
+                                                            <%= otherUser ? otherUser.name : 'Usuário' %>
+                                                        </h3>
+                                                        <% if (selectedChat && selectedChat.job) { %>
+                                                            <p class="chat-job-title">Vaga: <%= selectedChat.job.title
+                                                                    %>
+                                                            </p>
+                                                            <% } else { %>
+                                                                <p class="chat-job-title">Chat administrativo</p>
+                                                                <% } %>
+                                                    </div>
+                                </div>
+
+                                <div class="chat-actions">
+                                    <% if (selectedChat && selectedChat.status==="CLOSED" && canReactivate) { %>
+                                        <button id="reactivate-chat-btn" class="btn success-btn">
+                                            <i class="fas fa-unlock"></i> Reativar Chat
+                                        </button>
+                                        <% } else if (selectedChat && selectedChat.status !=="CLOSED" && canClose) { %>
+                                            <button id="close-chat-btn" class="btn danger-btn">
+                                                <i class="fas fa-times-circle"></i> Encerrar Chat
+                                            </button>
+                                            <% } else if (selectedChat && selectedChat.status==="CLOSED" ) { %>
+                                                <span class="chat-closed-badge">
+                                                    <i class="fas fa-lock"></i> Chat Encerrado
+                                                </span>
+                                                <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-messages" id="chat-messages">
+                            <!-- As mensagens serão carregadas via JavaScript -->
+                            <div class="loading-messages">Carregando mensagens...</div>
+                        </div>
+
+                        <div class="chat-input">
+                            <form id="message-form">
+                                <textarea id="message-content"
+                                    placeholder="<%= (selectedChat && selectedChat.status === 'CLOSED') ? 'Este chat está encerrado' : 'Digite sua mensagem...' %>"
+                                    required <%=(selectedChat && selectedChat.status==='CLOSED' ) ? 'disabled' : ''
+                                    %>></textarea>
+                                <button type="submit" class="btn primary-btn" <%=(selectedChat &&
+                                    selectedChat.status==='CLOSED' ) ? 'disabled' : '' %>>Enviar</button>
+                            </form>
+                        </div>
+                    </div>
+                    <% } else { %>
+                        <div class="no-chat-selected">
+                            <div class="no-chat-content">
+                                <i class="fas fa-comments"></i>
+                                <h2>Selecione um chat para começar</h2>
+                                <p>Escolha uma conversa na lista à esquerda para visualizar as mensagens.</p>
+                            </div>
+                        </div>
+                        <% } %>
+            </div>
+        </main>
+
+        <%- include('partials/footer') %>
+
+            <script src="/js/main.js"></script>
+            <script src="/js/notifications.js"></script>
+            <script>
+                // Passar variáveis para o JavaScript
+                window.selectedChatId = <%= selectedChatId || 'null' %>;
+                window.currentUserId = <%= user ? user.id : 'null' %>;
+            </script>
+            <script src="/js/chat-interface.js"></script>
+</body>
+
+</html>

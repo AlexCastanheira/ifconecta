@@ -1,0 +1,21 @@
+<header>
+    <nav>
+        <nav>
+            <div class="logo">
+                <h1>
+                    <span style="color: green;">IF</span>
+                    <span style="color: red;">(</span>
+                    <span style="color: green;">Conecta</span>
+                    <span style="color: red;">)</span>
+                </h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/">Início</a></li>
+                <% if (req.path==='/auth/login' ) { %>
+                    <li><a href="/auth/register" class="register-btn">Cadastrar</a></li>
+                    <% } else { %>
+                        <li><a href="/auth/login">Entrar</a></li>
+                        <% } %>
+            </ul>
+        </nav>
+</header>

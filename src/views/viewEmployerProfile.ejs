@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil da Empresa - If(Conecta)</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/perfil.css">
+    <link rel="stylesheet" href="/css/vagas.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.core.css" rel="stylesheet">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+</head>
+
+<body>
+    <%- include('partials/header') %>
+
+        <main class="container">
+            <div class="profile-header-actions">
+                <h2>Perfil da Empresa</h2>
+                <button class="btn secondary-btn" onclick="window.history.back()">Voltar</button>
+            </div>
+
+            <% if (error) { %>
+                <div class="error-message">
+                    <%= error %>
+                </div>
+                <% } %>
+
+                    <div class="profile-container">
+                        <div class="profile-header">
+                            <div class="profile-photo">
+                                <% if (profileUser.photo) { %>
+                                    <img src="/uploads/<%= profileUser.photo %>" alt="<%= profileUser.name %>">
+                                    <% } else { %>
+                                        <div class="no-photo">
+                                            <%= profileUser.name.charAt(0).toUpperCase() %>
+                                        </div>
+                                        <% } %>
+                            </div>
+
+                            <div class="profile-info">
+                                <h3>
+                                    <%= profileUser.name %>
+                                </h3>
+                                <p>
+                                    <%= profileUser.email %>
+                                </p>
+                                <% if (user.type==="admin" ) { %>
+                                    <div class="admin-actions" style="margin-top: 10px;">
+                                        <button id="start-chat-btn" class="btn primary-btn"
+                                            data-user-id="<%= profileUser.id %>">
+                                            <i class="fas fa-comment"></i> Iniciar Chat
+                                        </button>
+                                    </div>
+                                    <% } %>
+                            </div>
+                        </div>
+
+                        <div class="profile-content">
+                            <div class="profile-section">
+                                <h3>Sobre a Empresa</h3>
+                                <% if (profileUser.profile) { %>
+                                    <div class="quill-content-display">
+                                        <%- profileUser.profile %>
+                                    </div>
+                                    <% } else { %>
+                                        <p class="empty-info">Nenhuma informação adicionada.</p>
+                                        <% } %>
+                            </div>
+                        </div>
+
+                        <div class="profile-section">
+                            <h3>Razão Social</h3>
+                            <% if (user.social) { %>
+                                <p>
+                                    <%= user.social %>
+                                </p>
+                                <% } else { %>
+                                    <p class="empty-info">Nenhuma informação adicionada.</p>
+                                    <% } %>
+                        </div>
+
+                        <div class="profile-section">
+                            <h3>Links</h3>
+                            <% if (profileUser.links && profileUser.links.length> 0) { %>
+                                <ul class="links-list">
+                                    <% profileUser.links.forEach(link=> { %>
+                                        <li><a href="<%= link.url %>" target="_blank" rel="noopener noreferrer">
+                                                <%= link.url %>
+                                            </a></li>
+                                        <% }) %>
+                                </ul>
+                                <% } else { %>
+                                    <p class="empty-info">Nenhum link adicionado.</p>
+                                    <% } %>
+                        </div>
+                    </div>
+                    </div>
+        </main>
+
+        <%- include('partials/footer') %>
+
+            <script src="/js/main.js"></script>
+            <script src="/js/notifications.js"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const startChatBtn = document.getElementById('start-chat-btn');
+                    if (startChatBtn) {
+                        startChatBtn.addEventListener('click', async function () {
+                            const userId = this.dataset.userId;
+                            try {
+                                const response = await fetch('/chat/start-admin', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ userId })
+                                });
+
+                                if (response.ok) {
+                                    const data = await response.json();
+                                    window.location.href = `/chat/${data.chatId}`;
+                                } else {
+                                    const error = await response.json();
+                                    alert(`Erro ao iniciar chat: ${error.message}`);
+                                }
+                            } catch (error) {
+                                console.error('Erro:', error);
+                                alert('Ocorreu um erro ao iniciar o chat.');
+                            }
+                        });
+                    }
+                });
+            </script>
+</body>
+
+</html>

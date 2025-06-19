@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Empregadores - If(Conecta)</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body>
+    <%- include('partials/header') %>
+
+        <div class="admin-container container">
+            <div class="admin-header">
+                <h1>Gerenciar Empregadores</h1>
+                <a href="/admin/dashboard" class="btn secondary-btn">Voltar ao Dashboard</a>
+            </div>
+
+            <div class="search-filter">
+                <input type="text" id="employerSearch" placeholder="Buscar empregador..." class="search-input">
+            </div>
+
+            <div class="admin-table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Empresa</th>
+                            <th>Status</th>
+                            <th>Data de Cadastro</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (employers.length===0) { %>
+                            <tr>
+                                <td colspan="7" class="empty-table">Nenhum empregador encontrado</td>
+                            </tr>
+                            <% } else { %>
+                                <% employers.forEach(employer=> { %>
+                                    <tr data-user-id="<%= employer.id %>"
+                                        class="user-row <%= employer.status ? 'active' : 'blocked' %>">
+                                        <td>
+                                            <%= employer.id %>
+                                        </td>
+                                        <td>
+                                            <%= employer.name %>
+                                        </td>
+                                        <td>
+                                            <%= employer.email %>
+                                        </td>
+                                        <td>
+                                            <%= employer.social || 'Não informado' %>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge <%= employer.status ? 'active' : 'blocked' %>">
+                                                <%= employer.status ? 'Ativo' : 'Inativo' %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <%= new Date(employer.createdAt).toLocaleDateString('pt-BR') %>
+                                        </td>
+                                        <td class="actions-cell">
+                                            <a href="/users/view/<%= employer.id %>" class="btn small-btn view-btn"
+                                                title="Ver Perfil">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+
+                                            <button class="btn small-btn chat-btn start-chat-btn"
+                                                data-user-id="<%= employer.id %>" title="Iniciar Chat">
+                                                <i class="fas fa-comment"></i>
+                                            </button>
+
+                                            <% if (!employer.status) { %>
+                                                <button class="btn small-btn unblock-btn toggle-status-btn"
+                                                    data-user-id="<%= employer.id %>" data-status="true" title="Ativar">
+                                                    <i class="fas fa-unlock"></i>
+                                                </button>
+                                                <% } else { %>
+                                                    <button class="btn small-btn block-btn toggle-status-btn"
+                                                        data-user-id="<%= employer.id %>" data-status="false"
+                                                        title="Desativar">
+                                                        <i class="fas fa-ban"></i>
+                                                    </button>
+                                                    <% } %>
+
+                                                        <button class="btn small-btn delete-btn"
+                                                            data-user-id="<%= employer.id %>" title="Excluir">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <%- include('partials/footer') %>
+
+            <script src="/js/main.js"></script>
+            <script src="/js/notifications.js"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Busca de empregadores
+                    const searchInput = document.getElementById('employerSearch');
+                    searchInput.addEventListener('input', function () {
+                        const searchTerm = this.value.toLowerCase();
+                        const rows = document.querySelectorAll('.user-row');
+
+                        rows.forEach(row => {
+                            const name = row.children[1].textContent.toLowerCase();
+                            const email = row.children[2].textContent.toLowerCase();
+                            const company = row.children[3].textContent.toLowerCase();
+
+                            if (name.includes(searchTerm) || email.includes(searchTerm) || company.includes(searchTerm)) {
+                                row.style.display = '';
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+                    });
+
+                    // Iniciar chat com usuário
+                    document.querySelectorAll('.start-chat-btn').forEach(btn => {
+                        btn.addEventListener('click', async function () {
+                            const userId = this.dataset.userId;
+                            try {
+                                const response = await fetch('/chat/start-admin', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ userId })
+                                });
+
+                                if (response.ok) {
+                                    const data = await response.json();
+                                    window.location.href = `/chat/${data.chatId}`;
+                                } else {
+                                    const error = await response.json();
+                                    alert(`Erro ao iniciar chat: ${error.message}`);
+                                }
+                            } catch (error) {
+                                console.error('Erro:', error);
+                                alert('Ocorreu um erro ao iniciar o chat.');
+                            }
+                        });
+                    });
+
+                    // Alternar status do usuário (bloquear/desbloquear)
+                    document.querySelectorAll('.toggle-status-btn').forEach(btn => {
+                        btn.addEventListener('click', async function () {
+                            const userId = this.dataset.userId;
+                            const newStatus = this.dataset.status;
+                            const action = newStatus === "true" ? "desbloquear" : "bloquear";
+
+                            if (!confirm(`Tem certeza que deseja ${action} este empregador?`)) return;
+
+                            try {
+                                const response = await fetch(`/admin/users/${userId}/toggle-status`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ status: newStatus })
+                                });
+
+                                const data = await response.json();
+                                if (data.success) {
+                                    alert(`Empregador ${action === "bloquear" ? "bloqueado" : "desbloqueado"} com sucesso!`);
+                                    location.reload();
+                                } else {
+                                    alert(`Erro ao ${action} empregador: ${data.error || 'Erro desconhecido'}`);
+                                }
+                            } catch (error) {
+                                console.error('Erro:', error);
+                                alert(`Erro ao ${action} empregador`);
+                            }
+                        });
+                    });
+
+                    // Deletar usuário
+                    document.querySelectorAll('.delete-btn').forEach(btn => {
+                        btn.addEventListener('click', async function () {
+                            if (!confirm('ATENÇÃO: Esta ação é irreversível! Tem certeza que deseja excluir este empregador e todos os seus dados?')) return;
+
+                            const userId = this.dataset.userId;
+                            try {
+                                const response = await fetch(`/admin/users/${userId}`, {
+                                    method: 'DELETE'
+                                });
+
+                                const data = await response.json();
+                                if (data.success) {
+                                    alert('Empregador excluído com sucesso!');
+                                    document.querySelector(`tr[data-user-id="${userId}"]`).remove();
+                                } else {
+                                    alert('Erro ao excluir empregador: ' + (data.error || 'Erro desconhecido'));
+                                }
+                            } catch (error) {
+                                console.error('Erro:', error);
+                                alert('Erro ao excluir empregador');
+                            }
+                        });
+                    });
+                });
+            </script>
+</body>
+
+</html>

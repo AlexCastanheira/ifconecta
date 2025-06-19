@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excluir conta</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body>
+    <%- include('partials/header') %>
+
+
+        <div class="auth-container">
+            <div class="auth-card">
+                <h2>Excluir Conta</h2>
+
+
+
+                <div class="alert alert-danger">
+                    <strong>Atenção!</strong> Esta ação é irreversível. Todos os seus dados serão permanentemente
+                    excluídos.
+                </div>
+
+                <% if (typeof error !=='undefined' && error) { %>
+                    <div class="alert alert-danger">
+                        <%= error %>
+                    </div>
+                    <% } %>
+
+                        <form action="/users/delete-account" method="POST">
+                            <div class="form-group">
+                                <label for="password">Digite sua senha para confirmar</label>
+                                <input type="password" id="password" name="password" required>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="checkbox">
+                                    <input type="checkbox" id="confirm" name="confirm" required>
+                                    <label for="confirm">
+                                        Eu entendo que esta ação é irreversível e desejo excluir minha conta
+                                        permanentemente.
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn primary-btn">Excluir Conta Permanentemente</button>
+                                <a href="<%= user.type.toLowerCase() === 'student' ? '/users/perfil-estudante' : '/users/perfil-empregador' %>"
+                                    class="btn secondary-btn">Cancelar</a>
+                            </div>
+                        </form>
+            </div>
+        </div>
+
+        <body>
+            <%- include('partials/footer') %>

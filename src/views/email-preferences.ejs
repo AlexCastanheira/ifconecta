@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurar notificações</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/perfil.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/css/email-settings.css">
+</head>
+
+<body>
+    <%- include('partials/header') %>
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+
+                    <% if (req.query.success) { %>
+                        <div class="alert alert-success">
+                            <%= req.query.success %>
+                        </div>
+                        <% } %>
+
+                            <% if (req.query.error) { %>
+                                <div class="alert alert-danger">
+                                    <%= req.query.error %>
+                                </div>
+                                <% } %>
+
+                                    <div class="card">
+                                        <div class="card-header bg-success text-white">
+                                            <h4 class="mb-0">Preferências de Email</h4>
+                                        </div>
+                                        <div class="card-body">
+                                            <form method="POST" action="/users/email-preferences">
+
+                                                <% if (user.type==='student' ) { %>
+                                                    <div class="form-group mb-3">
+                                                        <label class="switch-container">
+                                                            <input type="checkbox" id="emailJobNotifications"
+                                                                name="emailJobNotifications"
+                                                                <%=user.emailJobNotifications ? 'checked' : '' %>>
+                                                            <span class="switch-slider"></span>
+                                                            <span class="switch-label">Receber notificações de novas
+                                                                vagas por email</span>
+                                                        </label>
+                                                        <p class="form-help">Receba alertas sobre novas vagas que
+                                                            correspondam ao seu perfil.</p>
+                                                    </div>
+                                                    <% } %>
+
+                                                        <% if (user.type==='employer' ) { %>
+                                                            <div class="form-group mb-3">
+                                                                <label class="switch-container">
+                                                                    <input type="checkbox"
+                                                                        id="emailApplicationNotifications"
+                                                                        name="emailApplicationNotifications"
+                                                                        <%=user.emailApplicationNotifications
+                                                                        ? 'checked' : '' %>>
+                                                                    <span class="switch-slider"></span>
+                                                                    <span class="switch-label">Receber notificações de
+                                                                        novas candidaturas por email</span>
+                                                                </label>
+                                                                <p class="form-help">Seja notificado quando um estudante
+                                                                    se candidatar às suas vagas.</p>
+                                                            </div>
+                                                            <% } %>
+
+                                                                <div class="form-group mb-3">
+                                                                    <label class="switch-container">
+                                                                        <input type="checkbox"
+                                                                            id="emailMessageNotifications"
+                                                                            name="emailMessageNotifications"
+                                                                            <%=user.emailMessageNotifications
+                                                                            ? 'checked' : '' %>>
+                                                                        <span class="switch-slider"></span>
+                                                                        <span class="switch-label">Receber notificações
+                                                                            de novas mensagens por email</span>
+                                                                    </label>
+                                                                    <p class="form-help">Receba alertas quando receber
+                                                                        novas mensagens no chat.</p>
+                                                                </div>
+
+                                                                <div class="form-actions">
+                                                                    <button type="submit" class="btn btn-success">Salvar
+                                                                        Preferências</button>
+                                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                </div>
+            </div>
+        </div>
+</body>
+
+<%- include('partials/footer') %>

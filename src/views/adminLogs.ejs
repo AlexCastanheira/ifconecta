@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs de Administração - If(Conecta)</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body>
+    <%- include('partials/header') %>
+
+        <main class="container">
+            <div class="admin-container">
+                <div class="admin-header">
+                    <h1>Logs de Administração</h1>
+                    <a href="/admin/dashboard" class="btn secondary-btn">Voltar ao Dashboard</a>
+                </div>
+
+                <div class="logs-container">
+                    <form class="log-filters" method="GET" action="/admin/logs">
+                        <select name="action" id="action-filter">
+                            <option value="">Todas as ações</option>
+                            <option value="USER_CREATED" <%=actionFilter==='USER_CREATED' ? 'selected' : '' %>>Usuário
+                                criado</option>
+                            <option value="USER_UPDATED" <%=actionFilter==='USER_UPDATED' ? 'selected' : '' %>>Usuário
+                                atualizado</option>
+                            <option value="USER_DELETED" <%=actionFilter==='USER_DELETED' ? 'selected' : '' %>>Usuário
+                                excluído</option>
+                            <option value="USER_BLOCKED" <%=actionFilter==='USER_BLOCKED' ? 'selected' : '' %>>Usuário
+                                bloqueado</option>
+                            <option value="USER_UNBLOCKED" <%=actionFilter==='USER_UNBLOCKED' ? 'selected' : '' %>
+                                >Usuário desbloqueado</option>
+                            <option value="EMPLOYER_APPROVED" <%=actionFilter==='EMPLOYER_APPROVED' ? 'selected' : '' %>
+                                >Empregador aprovado</option>
+                            <option value="EMPLOYER_REJECTED" <%=actionFilter==='EMPLOYER_REJECTED' ? 'selected' : '' %>
+                                >Empregador rejeitado</option>
+                            <option value="JOB_DELETED" <%=actionFilter==='JOB_DELETED' ? 'selected' : '' %>>Vaga
+                                excluída</option>
+                        </select>
+
+                        <select name="admin" id="admin-filter">
+                            <option value="">Todos os administradores</option>
+                            <% admins.forEach(function(admin) { %>
+                                <option value="<%= admin.id %>" <%=adminFilter==admin.id ? 'selected' : '' %>><%=
+                                        admin.name %>
+                                </option>
+                                <% }); %>
+                        </select>
+
+                        <input type="date" name="date" id="date-filter" value="<%= dateFilter || '' %>">
+
+                        <button type="submit" class="btn primary-btn">Filtrar</button>
+                        <a href="/admin/logs" class="btn secondary-btn">Limpar</a>
+                    </form>
+
+                    <% if (logs && logs.length> 0) { %>
+                        <div class="logs-list">
+                            <% logs.forEach(function(log) { %>
+                                <div class="log-item">
+                                    <div class="log-content">
+                                        <% let actionClass='' ; let actionText=log.action; if
+                                            (log.action.includes('CREATED') || log.action.includes('APPROVED')) {
+                                            actionClass='create' ; } else if (log.action.includes('UPDATED')) {
+                                            actionClass='update' ; } else if (log.action.includes('DELETED') ||
+                                            log.action.includes('REJECTED')) { actionClass='delete' ; } else if
+                                            (log.action.includes('BLOCKED')) { actionClass='block' ; } else if
+                                            (log.action.includes('UNBLOCKED')) { actionClass='unblock' ; } // Formatar
+                                            texto da ação if (log.action.includes('USER_CREATED')) {
+                                            actionText='Usuário criado' ; } else if
+                                            (log.action.includes('USER_UPDATED')) { actionText='Usuário atualizado' ; }
+                                            else if (log.action.includes('USER_DELETED')) {
+                                            actionText='Usuário excluído' ; } else if
+                                            (log.action.includes('USER_BLOCKED')) { actionText='Usuário bloqueado' ; }
+                                            else if (log.action.includes('USER_UNBLOCKED')) {
+                                            actionText='Usuário desbloqueado' ; } else if
+                                            (log.action.includes('EMPLOYER_APPROVED')) {
+                                            actionText='Empregador aprovado' ; } else if
+                                            (log.action.includes('EMPLOYER_REJECTED')) {
+                                            actionText='Empregador rejeitado' ; } else if
+                                            (log.action.includes('JOB_DELETED')) { actionText='Vaga excluída' ; } //
+                                            Extrair ID do objeto afetado let idMatch=log.action.match(/:(\d+)$/); let
+                                            objectId=idMatch ? idMatch[1] : '' ; if (objectId) { actionText=actionText
+                                            + ' (ID: ' + objectId + ')' ; } %>
+                                            <span class="log-action <%= actionClass %>">
+                                                <%= actionText %>
+                                            </span>
+                                    </div>
+                                    <div class="log-meta">
+                                        <span class="log-admin">Por: <%= log.admin.name %></span>
+                                        <span class="log-date">
+                                            <%= new Date(log.createdAt).toLocaleString('pt-BR') %>
+                                        </span>
+                                    </div>
+                                </div>
+                                <% }); %>
+                        </div>
+
+                        <% if (totalPages> 1) { %>
+                            <div class="pagination">
+                                <% if (currentPage> 1) { %>
+                                    <a href="/admin/logs?page=<%= currentPage - 1 %><%= actionFilter ? '&action=' + actionFilter : '' %><%= adminFilter ? '&admin=' + adminFilter : '' %><%= dateFilter ? '&date=' + dateFilter : '' %>"
+                                        class="pagination-btn">&laquo; Anterior</a>
+                                    <% } %>
+
+                                        <% for (let i=1; i <=totalPages; i++) { %>
+                                            <a href="/admin/logs?page=<%= i %><%= actionFilter ? '&action=' + actionFilter : '' %><%= adminFilter ? '&admin=' + adminFilter : '' %><%= dateFilter ? '&date=' + dateFilter : '' %>"
+                                                class="pagination-btn <%= i === currentPage ? 'active' : '' %>">
+                                                <%= i %>
+                                            </a>
+                                            <% } %>
+
+                                                <% if (currentPage < totalPages) { %>
+                                                    <a href="/admin/logs?page=<%= currentPage + 1 %><%= actionFilter ? '&action=' + actionFilter : '' %><%= adminFilter ? '&admin=' + adminFilter : '' %><%= dateFilter ? '&date=' + dateFilter : '' %>"
+                                                        class="pagination-btn">Próximo &raquo;</a>
+                                                    <% } %>
+                            </div>
+                            <% } %>
+
+                                <p class="text-center mt-3">Mostrando <%= logs.length %> de <%= totalLogs %> logs</p>
+                                <% } else { %>
+                                    <div class="empty-table">
+                                        <p>Nenhum log encontrado.</p>
+                                    </div>
+                                    <% } %>
+                </div>
+            </div>
+        </main>
+
+        <%- include('partials/footer') %>
+
+            <script src="/js/main.js"></script>
+            <script src="/js/notifications.js"></script>
+</body>
+
+</html>

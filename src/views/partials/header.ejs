@@ -1,0 +1,64 @@
+<link rel="stylesheet" href="/css/dropdown.css">
+<link rel="stylesheet" href="/css/badges.css">
+<header>
+  <nav>
+    <div class="logo">
+      <a href="/" style="text-decoration: none; color: inherit;">
+        <h1>
+          <span style="color: green;">if</span>
+          <span style="color: red;">(</span>
+          <span style="color: green;">Conecta</span>
+          <span style="color: red;">)</span>
+          <span style="color: rgb(0, 46, 172);">{</span>
+        </h1>
+      </a>
+    </div>
+    <ul class="nav-links">
+      <% if (user) { %>
+        <% if (user.type.toLowerCase()==='student' ) { %>
+          <li><a href="/users/perfil-estudante">Meu Perfil</a></li>
+          <li><a href="/jobs/list">Vagas</a></li>
+          <li><a href="/chat/list">Mensagens</a></li>
+          <% } else if (user.type.toLowerCase()==='employer' ) { %>
+            <li><a href="/users/perfil-empregador">Meu Perfil</a></li>
+            <li><a href="/jobs/create">Criar Vaga</a></li>
+            <li><a href="/jobs/list">Minhas Vagas</a></li>
+            <li><a href="/chat/list">Mensagens</a></li>
+            <% } else if (user.type.toLowerCase()==='admin' ) { %>
+              <li><a href="/admin/dashboard">Dashboard</a></li>
+              <li><a href="/admin/reports">Relatórios</a></li>
+              <li><a href="/jobs/list">Vagas</a></li>
+              <li><a href="/chat/list">Mensagens</a></li>
+              <% } %>
+                <li>
+                  <%- include('../partials/notifications', { notifications: locals.notifications || [], unreadCount:
+                    locals.unreadCount || 0 }) %>
+                </li>
+                <li class="settings-dropdown">
+                  <button id="settings-toggle" class="settings-toggle" aria-haspopup="true" aria-expanded="false">
+                    <span class="settings-icon">⚙️</span>
+                  </button>
+                  <div id="settings-panel" class="settings-panel" role="menu" aria-hidden="true">
+                    <div class="settings-header">
+                      <h3>Configurações</h3>
+                    </div>
+                    <div class="settings-list">
+                      <a href="/users/email-preferences" class="settings-item">Configurar</a>
+                      <a href="/users/change-password" class="settings-item">Alterar senha</a>
+                      <a href="/users/delete-account" class="settings-item danger">Excluir perfil</a>
+                    </div>
+                  </div>
+                </li>
+                <li><a href="/auth/logout" class="logout-btn">Sair</a></li>
+                <% } else { %>
+                  <li><a href="/auth/login">Entrar</a></li>
+                  <li><a href="/auth/register" class="register-btn">Cadastrar</a></li>
+                  <% } %>
+    </ul>
+  </nav>
+</header>
+
+<!-- Scripts e estilos -->
+
+<script src="/js/dropdown.js"></script>
+<script src="https://unpkg.com/feather-icons"></script>

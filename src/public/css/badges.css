@@ -1,0 +1,124 @@
+/* src/public/css/badges.css - VERSÃO CORRIGIDA E ATUALIZADA */
+
+/* Estilos para badges com ícones */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    margin: 4px;
+    transition: all 0.2s ease;
+    border-width: 1px;
+    border-style: solid;
+    animation: badgeAppear 0.3s ease forwards;
+}
+
+.badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.badge-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+}
+
+.badge-icon-svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+}
+
+.badge-text {
+    line-height: 1;
+}
+
+.remove-badge {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+    margin-left: 4px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Cores diferentes para categorias de badges (estilo original restaurado) */
+.badge.programming {
+    background-color: #e9f5fe;
+    color: #3498db;
+    border-color: rgba(52, 152, 219, 0.2);
+}
+
+.badge.frontend {
+    background-color: #f8e9f5;
+    color: #9b59b6;
+    border-color: rgba(155, 89, 182, 0.2);
+}
+
+.badge.backend {
+    background-color: #e8f8f5;
+    color: #2ecc71;
+    border-color: rgba(46, 204, 113, 0.2);
+}
+
+.badge.database {
+    background-color: #fef5e9;
+    color: #f39c12;
+    border-color: rgba(243, 156, 18, 0.2);
+}
+
+.badge.devops {
+    background-color: #f8e9e9;
+    color: #e74c3c;
+    border-color: rgba(231, 76, 60, 0.2);
+}
+
+.badge.other {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border-color: #dee2e6;
+}
+
+/* Estilos para a lista de badges */
+.badges-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 15px 0;
+}
+
+/* Animação para adicionar badges (mantida do novo estilo) */
+@keyframes badgeAppear {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .badge {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+
+    .badge-icon {
+        width: 16px;
+        height: 16px;
+    }
+}

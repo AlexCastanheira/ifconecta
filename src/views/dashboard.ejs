@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - If(Conecta)</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body>
+    <%- include('partials/header') %>
+
+        <main class="container">
+            <div class="admin-dashboard">
+                <h1>Dashboard Administrativo</h1>
+
+                <div class="admin-stats">
+                    <div class="stat-card">
+                        <h3>Estudantes</h3>
+                        <div class="stat-number">
+                            <%= studentsCount %>
+                        </div>
+                        <a href="/admin/students" class="btn primary-btn">Gerenciar</a>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>Empregadores</h3>
+                        <div class="stat-number">
+                            <%= employersCount %>
+                        </div>
+                        <a href="/admin/employers" class="btn primary-btn">Gerenciar</a>
+                    </div>
+
+
+
+                    <div class="stat-card">
+                        <h3>Vagas</h3>
+                        <div class="stat-number">
+                            <%= jobsCount %>
+                        </div>
+                        <a href="/admin/jobs" class="btn primary-btn">Gerenciar</a>
+                    </div>
+
+                    <div class="stat-card <%= pendingEmployers > 0 ? 'alert' : '' %>">
+                        <h3>Perfis Pendentes</h3>
+                        <div class="stat-number">
+                            <%= pendingEmployers %>
+                        </div>
+                        <a href="/admin/pending-employers"
+                            class="btn <%= pendingEmployers > 0 ? 'alert-btn' : 'primary-btn' %>">Revisar</a>
+                    </div>
+                </div>
+
+                <div class="admin-actions">
+                    <h2>Ações Administrativas</h2>
+                    <div class="action-buttons">
+                        <a href="/admin/reports" class="btn secondary-btn">Ver Relatórios e Análises</a>
+                    </div>
+
+
+                    <div class="action-buttons">
+                        <a href="/admin/badges/add" class="btn primary-btn">
+                            <i class="fas fa-plus-circle"></i> Adicionar Habilidade
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <%- include('partials/footer') %>
+
+            <script src="/js/main.js"></script>
+            <script src="/js/notifications.js"></script>
+</body>
+
+</html>

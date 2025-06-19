@@ -1,0 +1,31 @@
+# Variáveis de ambiente
+.env
+
+# Dependências do Node
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Build artifacts
+dist/
+build/
+.DS_Store
+npm-debug.log
+yarn-error.log
+
+# Prisma
+prisma/dev.db
+prisma/*.sqlite
+!prisma/migrations/ # Mantenha as migrations, ignore apenas o arquivo .db
+
+# Outros arquivos temporários ou de IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - If(Conecta)</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+  <%- include('partials/header') %>
+
+    <div class="auth-container">
+      <div class="auth-card">
+        <h2>Login</h2>
+
+        <% if (error) { %>
+          <div class="error-message">
+            <%= error %>
+          </div>
+          <% } %>
+
+            <form action="/auth/login" method="POST">
+              <div class="form-group">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" required>
+              </div>
+
+              <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" required>
+              </div>
+
+              <button type="submit" class="btn primary-btn">Entrar</button>
+            </form>
+
+            <div class="auth-links">
+              <p>Não tem uma conta? <a href="/auth/register">Cadastre-se</a></p>
+              <!-- Adicione este link para a página de esqueci minha senha -->
+              <p><a href="/auth/forgot-password">Esqueci minha senha</a></p>
+            </div>
+      </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+      <script src="/js/main.js"></script>
+</body>
+
+</html>

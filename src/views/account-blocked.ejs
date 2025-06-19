@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conta Bloqueada - If(Conecta)</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .blocked-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .blocked-icon {
+            font-size: 4rem;
+            color: #e74c3c;
+            margin-bottom: 1rem;
+        }
+
+        .blocked-title {
+            color: #e74c3c;
+            margin-bottom: 1rem;
+        }
+
+        .blocked-message {
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .contact-info {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('partials/auth-header') %>
+
+        <main class="container">
+            <div class="blocked-container">
+                <div class="blocked-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h2 class="blocked-title">Conta Bloqueada</h2>
+                <p class="blocked-message">
+                    Sua conta foi bloqueada por um administrador. Isso pode ter ocorrido devido a uma violação dos
+                    termos de uso ou por outro motivo administrativo.
+                </p>
+
+                <div class="contact-info">
+                    <h3>Entre em contato</h3>
+                    <p>Para mais informações ou para solicitar o desbloqueio da sua conta, entre em contato com o
+                        suporte:</p>
+                    <p><strong>Email:</strong> suporte@conectaifrs.com.br</p>
+                </div>
+
+                <a href="/auth/logout" class="btn primary-btn">Sair</a>
+            </div>
+        </main>
+
+        <%- include('partials/footer') %>
+</body>
+
+</html>

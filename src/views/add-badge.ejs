@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar Habilidade (Badge) - Admin</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/badges.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body>
+    <%- include('partials/header') %>
+
+        <main class="container admin-container">
+            <div class="admin-header">
+                <h2>Adicionar Nova Habilidade (Badge)</h2>
+                <a href="/admin/dashboard" class="btn secondary-btn">Voltar para Dashboard</a>
+            </div>
+
+            <% if (success) { %>
+                <div class="alert alert-success">
+                    <%= success %>
+                </div>
+                <% } %>
+                    <% if (error) { %>
+                        <div class="alert alert-danger">
+                            <%= error %>
+                        </div>
+                        <% } %>
+
+                            <div class="admin-card">
+                                <form action="/admin/badges" method="POST" class="form-horizontal">
+                                    <div class="form-group">
+                                        <label for="name">Nome da Habilidade:</label>
+                                        <input type="text" id="name" name="name" class="form-control" required
+                                            placeholder="Ex: JavaScript, Python, React">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="description">Descrição da Habilidade (Opcional):</label>
+                                        <textarea id="description" name="description" class="form-control" rows="3"
+                                            placeholder="Ex: Linguagem de programação para desenvolvimento web"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="category">Categoria:</label>
+                                        <select id="category" name="category" class="form-control" required>
+                                            <option value="">Selecione uma categoria</option>
+                                            <% badgeCategories.forEach(cat=> { %>
+                                                <option value="<%= cat.value %>">
+                                                    <%= cat.label %>
+                                                </option>
+                                                <% }) %>
+                                        </select>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn primary-btn">Adicionar Habilidade</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="admin-card mt-4">
+                                <h3>Habilidades Existentes</h3>
+                                <% if (existingBadges && existingBadges.length> 0) { %>
+                                    <div class="badges-container">
+                                        <% existingBadges.forEach(badge=> { %>
+                                            <span class="badge <%= badge.category %>">
+                                                <i data-feather="code" class="badge-icon-svg"></i>
+                                                <%= badge.name %>
+                                            </span>
+                                            <% }) %>
+                                    </div>
+                                    <% } else { %>
+                                        <p class="empty-info">Nenhuma habilidade cadastrada ainda.</p>
+                                        <% } %>
+                            </div>
+        </main>
+
+        <%- include('partials/footer') %>
+
+            <script src="/js/main.js"></script>
+            <script src="/js/notifications.js"></script>
+            <script src="https://unpkg.com/feather-icons"></script>
+            <script>
+                feather.replace(); // Inicializa os ícones Feather Icons
+            </script>
+</body>
+
+</html>

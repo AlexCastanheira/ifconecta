@@ -1,0 +1,156 @@
+.reports-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-unit) * 2;
+    /* 2rem */
+}
+
+.report-section {
+    background-color: var(--color-background-card);
+    border-radius: var(--border-radius-default);
+    box-shadow: var(--box-shadow-default);
+    padding: var(--spacing-unit) * 1.5;
+    /* 1.5rem */
+}
+
+.report-section h2 {
+    color: var(--color-secondary-dark);
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-unit);
+    /* 1rem */
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.data-table {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.data-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th {
+    background-color: #f8f9fa;
+    /* Fundo claro para cabeçalho de tabela */
+    padding: 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-secondary-dark);
+    border-bottom: 2px solid var(--color-border-light);
+}
+
+.data-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tr:hover {
+    background-color: var(--color-hover-light);
+}
+
+.empty-data {
+    text-align: center;
+    color: var(--color-text-light);
+    font-style: italic;
+    padding: var(--spacing-unit);
+    /* 1rem */
+}
+
+/* Estilos para o formulário de filtro por data */
+.date-filter-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-unit);
+    /* 1rem */
+}
+
+.date-inputs {
+    display: flex;
+    gap: var(--spacing-unit);
+    /* 1rem */
+    flex-wrap: wrap;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--color-secondary-dark);
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--color-border-light);
+    border-radius: 4px;
+    font-size: 1rem;
+    color: var(--color-secondary-dark);
+    background-color: var(--color-background-card);
+}
+
+/* Estilos para os cards de resumo */
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--spacing-unit);
+    /* 1rem */
+    margin-top: var(--spacing-unit);
+    /* 1rem */
+}
+
+.summary-card {
+    background-color: #f8f9fa;
+    /* Fundo claro */
+    border-radius: var(--border-radius-default);
+    padding: var(--spacing-unit) * 1.5;
+    /* 1.5rem */
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.summary-card h3 {
+    font-size: 1rem;
+    color: var(--color-text-light);
+    margin-bottom: 0.5rem;
+}
+
+.summary-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-accent-blue);
+}
+
+@media (max-width: 768px) {
+    .report-section {
+        padding: var(--spacing-unit);
+        /* 1rem */
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .summary-cards {
+        grid-template-columns: 1fr;
+    }
+}

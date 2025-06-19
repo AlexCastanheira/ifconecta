@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Erro - If(Conecta)</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+  <div class="error-container">
+    <h2>Erro</h2>
+    <p>
+      <%= error %>
+    </p>
+    <% if (typeof details !=='undefined' && details) { %>
+      <div class="error-details">
+        <p>
+          <%= details %>
+        </p>
+      </div>
+      <% } %>
+        <a href="/" class="btn primary-btn">Voltar para a Página Inicial</a>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprovação Pendente - If(Conecta)</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+</head>
+
+<body>
+
+
+    <main class="container">
+        <div class="auth-card" style="margin: 2rem auto; max-width: 600px;">
+            <h2>Aprovação Pendente</h2>
+
+            <div style="background-color: #fff3cd; color: #856404; padding: 1rem; border-radius: 4px; margin: 1rem 0;">
+                <h3>Olá, <%= user.name %>!</h3>
+                <p>Sua conta de empregador está aguardando aprovação por um administrador.</p>
+                <p>Você receberá um e-mail assim que sua conta for aprovada.</p>
+                <p>Enquanto isso, você não poderá publicar vagas ou acessar outras funcionalidades do sistema.</p>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="/auth/logout" class="btn danger-btn">Sair</a>
+            </div>
+        </div>
+    </main>
+
+    <%- include('partials/footer') %>
+
+        <script src="/js/main.js"></script>
+        <script src="/js/notifications.js"></script>
+</body>
+
+</html>

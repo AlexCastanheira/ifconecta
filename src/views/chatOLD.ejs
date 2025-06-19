@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat - If(Conecta)</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/chat.css">
+  <link rel="stylesheet" href="/css/notifications.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body>
+  <%- include('partials/header') %>
+
+    <main class="container">
+      <div class="chat-container">
+        <div class="chat-header">
+          <div class="chat-info">
+            <div class="chat-user">
+              <% if (otherUser && otherUser.photo) { %>
+                <img src="/uploads/<%= otherUser.photo %>" alt="<%= otherUser.name %>" class="chat-user-photo">
+                <% } else if (otherUser) { %>
+                  <div class="chat-user-photo-placeholder">
+                    <%= otherUser.name.charAt(0).toUpperCase() %>
+                  </div>
+                  <% } else { %>
+                    <div class="chat-user-photo-placeholder">
+                      ?
+                    </div>
+                    <% } %>
+                      <div>
+                        <h3>
+                          <%= otherUser ? otherUser.name : 'Usuário' %>
+                        </h3>
+                        <% if (chat && chat.job) { %>
+                          <p class="chat-job-title">Vaga: <%= chat.job.title %>
+                          </p>
+                          <% } else { %>
+                            <p class="chat-job-title">Chat administrativo</p>
+                            <% } %>
+                      </div>
+            </div>
+
+            <div class="chat-actions">
+              <% if (chat && chat.status==="CLOSED" && canReactivate) { %>
+                <button id="reactivate-chat-btn" class="btn success-btn">
+                  <i class="fas fa-unlock"></i> Reativar Chat
+                </button>
+                <% } else if (chat && chat.status !=="CLOSED" && canClose) { %>
+                  <button id="close-chat-btn" class="btn danger-btn">
+                    <i class="fas fa-times-circle"></i> Encerrar Chat
+                  </button>
+                  <% } else if (chat && chat.status==="CLOSED" ) { %>
+                    <span class="chat-closed-badge">
+                      <i class="fas fa-lock"></i> Chat Encerrado
+                    </span>
+                    <% } %>
+
+                      <a href="/chat/list" class="btn secondary-btn">Voltar para Chats</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-messages" id="chat-messages">
+          <!-- As mensagens serão carregadas via JavaScript -->
+          <div class="loading-messages">Carregando mensagens...</div>
+        </div>
+
+        <div class="chat-input">
+          <form id="message-form">
+            <textarea id="message-content"
+              placeholder="<%= (chat && chat.status === 'CLOSED') ? 'Este chat está encerrado' : 'Digite sua mensagem...' %>"
+              required <%=(chat && chat.status==='CLOSED' ) ? 'disabled' : '' %>></textarea>
+            <button type="submit" class="btn primary-btn" <%=(chat && chat.status==='CLOSED' ) ? 'disabled' : ''
+              %>>Enviar</button>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <%- include('partials/footer') %>
+
+      <script src="/js/main.js"></script>
+      <script src="/js/notifications.js"></script>
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const chatId = parseInt('<%= chat ? chat.id : 0 %>');
+          const currentUserId = parseInt('<%= user ? user.id : 0 %>');
+          const messagesContainer = document.getElementById('chat-messages');
+          const messageForm = document.getElementById('message-form');
+          const messageContent = document.getElementById('message-content');
+          const closeChatBtn = document.getElementById('close-chat-btn');
+          const reactivateChatBtn = document.getElementById('reactivate-chat-btn');
+          const isChatClosed = '<%= chat && chat.status %>' === 'CLOSED';
+
+          // Função para carregar mensagens
+          async function loadMessages() {
+            try {
+              const response = await fetch(`/chat/api/${chatId}/messages`);
+              if (response.ok) {
+                const messages = await response.json();
+                renderMessages(messages);
+              } else {
+                messagesContainer.innerHTML = '<div class="error-message">Erro ao carregar mensagens.</div>';
+              }
+            } catch (error) {
+              console.error('Erro:', error);
+              messagesContainer.innerHTML = '<div class="error-message">Erro ao carregar mensagens.</div>';
+            }
+          }
+
+          // Função para renderizar mensagens
+          function renderMessages(messages) {
+            if (!messages || messages.length === 0) {
+              messagesContainer.innerHTML = '<div class="no-messages">Nenhuma mensagem ainda. Inicie a conversa!</div>';
+              return;
+            }
+
+            messagesContainer.innerHTML = '';
+
+            messages.forEach(message => {
+              const isCurrentUser = message.senderId === currentUserId;
+              const messageDiv = document.createElement('div');
+
+              if (message.isSystemMessage) {
+                messageDiv.className = 'message system-message';
+                messageDiv.innerHTML = `
+                  <div class="message-content">${message.content}</div>
+                  <div class="message-meta">
+                    <span class="message-time">${new Date(message.createdAt).toLocaleTimeString()}</span>
+                  </div>
+                `;
+              } else {
+                messageDiv.className = `message ${isCurrentUser ? 'message-sent' : 'message-received'}`;
+                messageDiv.innerHTML = `
+                  <div class="message-content">${message.content}</div>
+                  <div class="message-meta">
+                    <span class="message-time">${new Date(message.createdAt).toLocaleTimeString()}</span>
+                    ${isCurrentUser ? `<span class="message-status">${message.read ? 'Lida' : 'Enviada'}</span>` : ''}
+                  </div>
+                `;
+              }
+
+              messagesContainer.appendChild(messageDiv);
+            });
+
+            // Rolar para a última mensagem
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+          }
+
+          // Função para enviar mensagem
+          async function sendMessage(content) {
+            try {
+              const response = await fetch(`/chat/api/${chatId}/messages`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content })
+              });
+
+              if (response.ok) {
+                const message = await response.json();
+                // Adicionar a nova mensagem à lista
+                const messages = Array.from(messagesContainer.querySelectorAll('.message'));
+                if (messages.length === 0 || messagesContainer.querySelector('.no-messages')) {
+                  loadMessages();
+                } else {
+                  const messageDiv = document.createElement('div');
+                  messageDiv.className = 'message message-sent';
+
+                  messageDiv.innerHTML = `
+                <div class="message-content">${message.content}</div>
+                <div class="message-meta">
+                  <span class="message-time">${new Date(message.createdAt).toLocaleTimeString()}</span>
+                  <span class="message-status">Enviada</span>
+                </div>
+              `;
+
+                  messagesContainer.appendChild(messageDiv);
+                  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+              } else {
+                const error = await response.json();
+                alert(`Erro: ${error.message}`);
+              }
+            } catch (error) {
+              console.error('Erro:', error);
+              alert('Ocorreu um erro ao enviar a mensagem.');
+            }
+          }
+
+          // Função para encerrar chat
+          async function closeChat() {
+            if (!confirm('Tem certeza que deseja encerrar este chat? Esta ação não pode ser desfeita.')) {
+              return;
+            }
+
+            try {
+              const response = await fetch(`/chat/api/${chatId}/close`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+              });
+
+              if (response.ok) {
+                alert('Chat encerrado com sucesso!');
+                window.location.reload();
+              } else {
+                const error = await response.json();
+                alert(`Erro: ${error.message}`);
+              }
+            } catch (error) {
+              console.error('Erro:', error);
+              alert('Ocorreu um erro ao encerrar o chat.');
+            }
+          }
+
+          // Função para reativar chat
+          async function reactivateChat() {
+            if (!confirm('Tem certeza que deseja reativar este chat?')) {
+              return;
+            }
+
+            try {
+              const response = await fetch(`/chat/api/${chatId}/reactivate`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+              });
+
+              if (response.ok) {
+                alert('Chat reativado com sucesso!');
+                window.location.reload();
+              } else {
+                const error = await response.json();
+                alert(`Erro: ${error.message}`);
+              }
+            } catch (error) {
+              console.error('Erro:', error);
+              alert('Ocorreu um erro ao reativar o chat.');
+            }
+          }
+
+          // Event listener para envio de mensagem
+          messageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Verificar novamente se o chat está fechado
+            if (isChatClosed) {
+              alert('Este chat está encerrado e não aceita mais mensagens.');
+              return;
+            }
+
+            const content = messageContent.value.trim();
+            if (!content) return;
+
+            await sendMessage(content);
+            messageContent.value = '';
+          });
+
+          // Event listener para encerrar chat
+          if (closeChatBtn) {
+            closeChatBtn.addEventListener('click', closeChat);
+          }
+
+          // Event listener para reativar chat
+          if (reactivateChatBtn) {
+            reactivateChatBtn.addEventListener('click', reactivateChat);
+          }
+
+          // Carregar mensagens iniciais
+          loadMessages();
+
+          // Verificar novas mensagens a cada 5 segundos
+          setInterval(loadMessages, 5000);
+        });
+      </script>
+</body>
+
+</html>

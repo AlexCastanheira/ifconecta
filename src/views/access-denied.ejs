@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acesso Negado - If(Conecta)</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/notifications.css">
+</head>
+
+<body>
+  <%- include('partials/header') %>
+
+    <main class="container">
+      <div class="auth-card" style="margin: 2rem auto; max-width: 600px; text-align: center;">
+        <h2>Acesso Negado</h2>
+        <p>
+          <%= error %>
+        </p>
+        <a href="/" class="btn primary-btn">Voltar para a Página Inicial</a>
+      </div>
+    </main>
+
+    <%- include('partials/footer') %>
+
+      <script src="/js/main.js"></script>
+      <script src="/js/notifications.js"></script>
+</body>
+
+</html>

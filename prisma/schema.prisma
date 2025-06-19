@@ -1,0 +1,161 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                            Int              @id @default(autoincrement())
+  email                         String           @unique
+  password                      String
+  name                          String
+  type                          String
+  status                        Boolean          @default(false)
+  profile                       String?
+  social                        String?
+  photo                         String?
+  createdAt                     DateTime         @default(now())
+  updatedAt                     DateTime         @updatedAt
+  // Campos para configurações de e-mail
+  emailPasswordReset            Boolean          @default(true)
+  emailJobNotifications         Boolean          @default(false)
+  emailMessageNotifications     Boolean          @default(false)
+  emailApplicationNotifications Boolean          @default(false)
+  // Campos para redefinição de senha
+  resetToken                    String?
+  resetTokenExpiry              DateTime?
+  // Relações
+  adminLogs                     AdminLog[]
+  blockedChats                  Chat[]           @relation("BlockedByUser")
+  initiatedChats                Chat[]           @relation("InitiatedChats")
+  chatsAsStudent                Chat[]           @relation("StudentChats")
+  chatsAsEmployer               Chat[]           @relation("EmployerChats")
+  jobs                          Job[]
+  applications                  JobApplication[]
+  messages                      Message[]
+  notifications                 Notification[]
+  badges                        UserBadge[]
+  links                         UserLink[]
+}
+
+model Badge {
+  id           Int              @id @default(autoincrement())
+  name         String           @unique
+  description  String?
+  category     String
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  requirements JobRequirement[]
+  users        UserBadge[]
+}
+
+model UserBadge {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  badgeId   Int
+  createdAt DateTime @default(now())
+  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+}
+
+model UserLink {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  url       String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Job {
+  id           Int              @id @default(autoincrement())
+  title        String
+  description  String?
+  contractType String
+  employerId   Int
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  status       Boolean          @default(true)
+  Chat         Chat[]
+  employer     User             @relation(fields: [employerId], references: [id], onDelete: Cascade)
+  applications JobApplication[]
+  requirements JobRequirement[]
+}
+
+model JobRequirement {
+  id        Int      @id @default(autoincrement())
+  jobId     Int
+  badgeId   Int
+  name      String
+  createdAt DateTime @default(now())
+  badge     Badge    @relation(fields: [badgeId], references: [id])
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}
+
+model JobApplication {
+  id        Int      @id @default(autoincrement())
+  jobId     Int
+  studentId Int
+  status    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  student   User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}
+
+model AdminLog {
+  id        Int      @id @default(autoincrement())
+  adminId   Int
+  action    String
+  createdAt DateTime @default(now())
+  admin     User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  message   String
+  type      String
+  relatedId String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Chat {
+  id            Int       @id @default(autoincrement())
+  jobId         Int?
+  employerId    Int
+  studentId     Int
+  status        String    @default("ACTIVE")
+  isBlocked     Boolean   @default(false)
+  blockedBy     Int?
+  blockedAt     DateTime?
+  closedAt      DateTime?
+  closedBy      Int?
+  initiatedBy   Int?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  blockedByUser User?     @relation("BlockedByUser", fields: [blockedBy], references: [id])
+  initiator     User?     @relation("InitiatedChats", fields: [initiatedBy], references: [id])
+  student       User      @relation("StudentChats", fields: [studentId], references: [id], onDelete: Cascade)
+  employer      User      @relation("EmployerChats", fields: [employerId], references: [id], onDelete: Cascade)
+  job           Job?      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  messages      Message[]
+}
+
+model Message {
+  id              Int      @id @default(autoincrement())
+  chatId          Int
+  senderId        Int
+  content         String
+  read            Boolean  @default(false)
+  isSystemMessage Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  sender          User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  chat            Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+}

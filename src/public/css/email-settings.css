@@ -1,0 +1,248 @@
+.settings-form {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+/* Removidas as regras de .form-check, .form-check-input e .form-check-label
+   já que o novo HTML usa .switch-container, .switch-slider e .switch-label.
+   Se você tiver outras partes do HTML que usam form-check, pode ser necessário
+   manter essas regras com seletividade adequada ou usar outras classes. */
+
+
+/* Estilos para o switch button */
+.switch-container {
+    position: relative;
+    display: flex;
+    /* Usa flexbox para alinhar label e switch */
+    align-items: center;
+    /* Alinha verticalmente no centro */
+    justify-content: space-between;
+    /* Empurra o texto para a esquerda e o switch para a direita */
+    width: 100%;
+    /* Ocupa a largura total do container pai */
+    height: 40px;
+    /* Altura do contêiner para melhor espaçamento */
+    cursor: pointer;
+    font-weight: normal;
+    /* Garante que o texto do label não seja bold por padrão */
+    color: #333;
+    /* Cor do texto do label */
+    margin-bottom: 10px;
+    /* Espaçamento entre os switches */
+}
+
+/* Esconde o checkbox padrão */
+.switch-container input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+    /* Esconde o input mas o mantém no DOM */
+}
+
+/* O slider (o 'trilho' do switch) */
+.switch-slider {
+    position: relative;
+    display: block;
+    /* Para poder aplicar width/height */
+    width: 50px;
+    /* Largura do switch */
+    height: 26px;
+    /* Altura do switch */
+    background-color: #ccc;
+    border-radius: 26px;
+    /* Para deixá-lo arredondado */
+    transition: 0.4s;
+    flex-shrink: 0;
+    /* Impede que o slider diminua */
+    margin-left: 15px;
+    /* Espaçamento entre o label e o slider */
+}
+
+/* O 'thumb' (o círculo que desliza) */
+.switch-slider::before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    /* Para deixá-lo circular */
+    transition: 0.4s;
+}
+
+/* Quando o checkbox está marcado */
+.switch-container input:checked+.switch-slider {
+    background-color: var(--color-primary-green);
+    /* Cor verde quando ligado */
+}
+
+.switch-container input:checked+.switch-slider::before {
+    transform: translateX(24px);
+    /* Move o thumb para a direita */
+}
+
+/* Estilo para o texto do label */
+.switch-label {
+    flex-grow: 1;
+    /* Permite que o texto ocupe o espaço restante à esquerda */
+    padding-right: 10px;
+    /* Espaçamento entre o texto e o switch */
+    font-size: 1rem;
+    line-height: 1.5;
+    /* Garante que o texto não "pule" */
+}
+
+
+.form-help {
+    margin-top: 5px;
+    margin-left: 25px;
+    /* Alinha com o texto do label do checkbox */
+    color: #666;
+    font-size: 0.9em;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+/* Forçar a cor do botão Salvar Preferências */
+.form-actions .btn.btn-success {
+    background-color: var(--color-primary-green);
+    /* Garante o verde primário */
+    color: white !important;
+    /* Garante o texto branco */
+}
+
+.success-message {
+    background-color: #e6f7ed;
+    /* Corrigido para Light green */
+    color: #218838;
+    /* Corrigido para Darker green */
+    border: 1px solid #d4edda;
+}
+
+.error-message {
+    background-color: #fbe9e9;
+    /* Corrigido para Light red */
+    color: #c0392b;
+    /* Corrigido para Darker red */
+    border: 1px solid #f2dcdc;
+}
+
+/* --- Responsividade para Telas Menores --- */
+@media (max-width: 768px) {
+
+    /* Ajustes para o container principal */
+    .container.mt-5 {
+        padding-top: 1rem !important;
+        /* Reduz o padding superior em telas pequenas, força a regra */
+        padding-left: 0 !important;
+        /* Remove padding lateral padrão do Bootstrap */
+        padding-right: 0 !important;
+        /* Remove padding lateral padrão do Bootstrap */
+        margin-top: 0 !important;
+        /* Remove margin-top em mobile */
+        width: 100% !important;
+        /* Garante largura total */
+        max-width: none !important;
+        /* Remove limite de largura */
+    }
+
+    /* Ajustes para a coluna do Bootstrap */
+    .col-md-8 {
+        padding: 0 !important;
+        /* Remove padding lateral da coluna */
+        width: 100% !important;
+        /* Garante que a coluna ocupe a largura total */
+        max-width: 100% !important;
+        /* Garante que a coluna ocupe a largura total */
+        flex: 0 0 100% !important;
+        /* Sobrescreve o flex do Bootstrap */
+    }
+
+    /* Ajustes para o card */
+    .card {
+        margin: 0 !important;
+        /* Remove margens extras do card em mobile */
+        border-radius: 0 !important;
+        /* Remove bordas arredondadas para ocupar 100% */
+        border: none !important;
+        /* Remove borda do card */
+        box-shadow: none !important;
+        /* Remove sombra do card */
+    }
+
+    .card-header {
+        padding: 15px;
+        /* Ajusta padding do header do card */
+    }
+
+    .card-body {
+        padding: 15px;
+        /* Ajusta padding do body do card */
+    }
+
+    /* Ajustes para os grupos de formulário */
+    .form-group {
+        padding: 10px;
+        /* Reduz o padding dos grupos de formulário */
+        margin-bottom: 15px;
+        /* Ajusta o espaçamento entre grupos */
+    }
+
+    /* Ajustes específicos para o switch em mobile */
+    .switch-container {
+        height: auto;
+        /* Permite que o contêiner se ajuste à altura do texto */
+        flex-direction: row;
+        /* Mantém o layout em linha em mobile */
+        align-items: center;
+        justify-content: space-between;
+        padding-right: 5px;
+        /* Pequeno ajuste no padding para o switch */
+    }
+
+    .switch-label {
+        font-size: 0.95rem;
+        /* Reduz o tamanho da fonte do label */
+        padding-right: 5px;
+        /* Ajusta o espaçamento do label */
+    }
+
+    .form-help {
+        margin-left: 0;
+        /* Remove a margem esquerda para alinhar com o texto principal */
+        padding-left: 10px;
+        /* Adiciona um pequeno padding para texto de ajuda */
+        font-size: 0.85em;
+        line-height: 1.4;
+    }
+
+    /* Ajustes para os botões de ação */
+    .form-actions {
+        flex-direction: column;
+        /* Coloca os botões em coluna */
+        gap: 10px;
+        /* Espaçamento entre os botões quando empilhados */
+    }
+
+    .form-actions .btn {
+        width: 100%;
+        /* Faz com que o botão ocupe a largura total */
+    }
+}

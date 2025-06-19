@@ -1,0 +1,520 @@
+/* Estilos para o sistema de chat */
+
+/* Layout de dois painéis */
+.chat-interface-container {
+  display: flex;
+  /* A altura para desktop pode ser baseada em vh ou ser flex-grow dentro de um main */
+  height: calc(100vh - 120px);
+  /* Exemplo: 120px para header + footer globais. AJUSTE CONFORME SEU LAYOUT GLOBAL */
+  /* Se o main.container for flex-grow:1 entre header/footer globais, então use height: 100%; */
+  margin: 20px auto;
+  max-width: 1200px;
+  /* Para desktop */
+  background-color: var(--color-background-card, white);
+  border-radius: var(--border-radius-default, 8px);
+  box-shadow: var(--box-shadow-default, 0 2px 10px rgba(0, 0, 0, 0.1));
+  overflow: hidden;
+  /* Impede que filhos causem scroll no container principal do chat */
+}
+
+.chat-list-panel {
+  width: 350px;
+  border-right: 1px solid var(--color-border-light, #eee);
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+  min-height: 0;
+  /* Permite encolher e ter scroll interno se necessário */
+  overflow: hidden;
+  /* Evita que o header ou a lista transbordem */
+}
+
+.chat-panel {
+  flex: 1;
+  /* Ocupa o espaço restante */
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-background-light, #f5f5f5);
+  min-height: 0;
+  /* CRUCIAL para o aninhamento de flex e overflow */
+  overflow: hidden;
+  /* Impede que o conteúdo interno (header, messages, input) o faça transbordar */
+}
+
+/* Cabeçalho da lista de chats */
+.chat-list-header {
+  padding: 15px;
+  border-bottom: 1px solid var(--color-border-light, #eee);
+  flex-shrink: 0;
+  /* Não deve encolher */
+}
+
+.chat-list-header h2 {
+  margin: 0 0 10px 0;
+  font-size: 1.2rem;
+  color: var(--color-secondary-dark, #2c3e50);
+}
+
+.chat-search {
+  position: relative;
+}
+
+.chat-search input {
+  width: 100%;
+  padding: 8px 30px 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.chat-search i {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-light, #666);
+}
+
+/* Lista de chats */
+.chats-list {
+  flex: 1;
+  /* Ocupa o espaço restante no chat-list-panel */
+  overflow-y: auto;
+  min-height: 0;
+  /* Importante para o scroll funcionar */
+}
+
+.chat-item {
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  border-bottom: 1px solid var(--color-border-light, #eee);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.chat-item:hover {
+  background-color: var(--color-hover-light, #f0f0f0);
+}
+
+.chat-item.active {
+  background-color: #e9f5fe;
+  border-left: 3px solid var(--color-accent-blue, #3498db);
+}
+
+.chat-item.unread .chat-item-user h3,
+.chat-item.unread .chat-last-message {
+  font-weight: bold;
+}
+
+
+.chat-item.closed {
+  opacity: 0.7;
+}
+
+.chat-item-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.chat-user-photo,
+.chat-user-photo-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.chat-user-photo-placeholder {
+  background-color: var(--color-accent-blue, #3498db);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.chat-item-user h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--color-secondary-dark, #2c3e50);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-job-title {
+  font-size: 0.8rem;
+  color: var(--color-text-light, #666);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-item-preview {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: 50px;
+  position: relative;
+}
+
+.chat-last-message {
+  font-size: 0.9rem;
+  color: var(--color-text-light, #666);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-grow: 1;
+}
+
+.chat-time-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  white-space: nowrap;
+}
+
+.chat-time {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.chat-unread-count {
+  background-color: var(--color-primary-red, #e74c3c);
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.chat-status-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  color: white;
+  margin-top: 3px;
+}
+
+.chat-status-badge.closed {
+  background-color: var(--color-primary-red-darker, #c0392b);
+}
+
+.no-chats {
+  padding: 30px;
+  text-align: center;
+}
+
+.no-chats p {
+  margin-bottom: 15px;
+  color: var(--color-text-light, #666);
+}
+
+.no-chat-selected {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+}
+
+.no-chat-content {
+  text-align: center;
+  padding: 30px;
+  max-width: 400px;
+}
+
+.no-chat-content i {
+  font-size: 4rem;
+  color: #ddd;
+  margin-bottom: 20px;
+}
+
+.no-chat-content h2 {
+  margin-bottom: 10px;
+  color: var(--color-secondary-dark, #2c3e50);
+}
+
+.no-chat-content p {
+  color: var(--color-text-light, #666);
+}
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chat-header {
+  padding: 15px;
+  border-bottom: 1px solid var(--color-border-light, #eee);
+  background-color: #f8f9fa;
+  flex-shrink: 0;
+  /* Não deve encolher */
+}
+
+.chat-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.chat-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chat-closed-badge {
+  background-color: var(--color-primary-red, #e74c3c);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.chat-messages {
+  flex-grow: 1;
+  /* Faz este elemento ocupar o espaço vertical restante */
+  /* flex-shrink: 1; (padrão, permite encolher se necessário) */
+  /* flex-basis: 0; (padrão com flex:1, permite crescer a partir de 0) */
+  padding: 15px;
+  overflow-y: auto;
+  /* Permite rolagem APENAS neste elemento */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: var(--color-background-light, #f5f5f5);
+  min-height: 0;
+  /* CRUCIAL para que overflow-y funcione em um item flex filho */
+}
+
+.chat-header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.chat-header-actions .btn {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.back-to-list {
+  display: none;
+  background-color: var(--color-accent-blue-darker, #2980b9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  margin-bottom: 10px;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.back-to-list i {
+  margin-right: 5px;
+}
+
+.chat-bubble {
+  max-width: 70%;
+  padding: 10px 15px;
+  border-radius: 18px;
+  position: relative;
+  word-wrap: break-word;
+  line-height: 1.4;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.chat-bubble.message-sent {
+  align-self: flex-end;
+  background-color: #dcf8c6;
+  color: #333;
+  border-bottom-right-radius: 5px;
+}
+
+.chat-bubble.message-received {
+  align-self: flex-start;
+  background-color: #f1f0f0;
+  color: var(--color-secondary-dark, #2c3e50);
+  border-bottom-left-radius: 5px;
+}
+
+.chat-bubble .message-content {
+  margin-bottom: 5px;
+  font-size: 0.95rem;
+}
+
+.chat-bubble .message-meta {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: #777;
+  text-align: right;
+}
+
+.chat-bubble.message-received .message-meta {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.chat-bubble .message-meta .message-status {
+  font-style: italic;
+}
+
+.loading-messages,
+.no-messages,
+.chat-panel .error-message {
+  text-align: center;
+  padding: 20px;
+  color: var(--color-text-light, #666);
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-input {
+  padding: 15px;
+  border-top: 1px solid var(--color-border-light, #eee);
+  background-color: #f8f9fa;
+  display: flex;
+  flex-shrink: 0;
+  /* MUITO IMPORTANTE: impede que a área de input seja esmagada */
+}
+
+.chat-input form {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.chat-input textarea {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  resize: none;
+  min-height: 42px;
+  max-height: 120px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.chat-input textarea:disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.chat-input button {
+  white-space: nowrap;
+}
+
+.chat-input button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.chat-bubble.system-message {
+  align-self: center;
+  background-color: #e9ecef;
+  color: var(--color-text-light, #666);
+  padding: 8px 15px;
+  border-radius: 18px;
+  max-width: 80%;
+  text-align: center;
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .chat-interface-container {
+    flex-direction: column;
+    height: 100vh;
+    /* Ocupa toda a altura da viewport */
+    /* Ou, para descontar um header global, se houver, fora deste container: 
+       height: calc(100vh - AlturaDoSeuHeaderGlobal); */
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    max-width: none;
+    /* Remove max-width para ocupar tela inteira */
+  }
+
+  .chat-list-panel,
+  .chat-panel {
+    width: 100%;
+    /* min-height: 0; já foi adicionado às regras gerais e é vital */
+    /* overflow: hidden; já foi adicionado às regras gerais e é vital */
+  }
+
+  .chat-list-panel {
+    /* Quando visível em mobile, pode ter uma altura flexível ou fixa */
+    /* Se for para ocupar toda a tela quando for o único visível: flex: 1; */
+    border-right: none;
+    border-bottom: 1px solid var(--color-border-light, #eee);
+  }
+
+  /* Quando o chat-panel é o único visível, ele deve ocupar todo o espaço do chat-interface-container */
+  .chat-panel:not(.hidden-on-mobile) {
+    flex: 1;
+    /* Garante que ele se expanda */
+  }
+
+
+  .chat-list-panel.hidden-on-mobile,
+  .chat-panel.hidden-on-mobile {
+    display: none !important;
+  }
+
+  /* Quando o chat-panel está visível em mobile, o botão de voltar aparece */
+  .chat-panel:not(.hidden-on-mobile) .back-to-list {
+    display: inline-flex;
+    align-items: center;
+    margin: 10px 15px 0;
+  }
+
+  .chat-panel:not(.hidden-on-mobile) .chat-header {
+    padding-top: 5px;
+  }
+
+  .chat-header-actions {
+    justify-content: flex-start;
+  }
+
+  .chat-bubble {
+    max-width: 85%;
+  }
+
+  /* Ajuste para o input não ser coberto pelo teclado virtual */
+  .chat-input {
+    /* flex-shrink: 0; já definido acima, ajuda a não ser esmagado. */
+    /* O comportamento exato com teclado virtual é complexo e pode depender do navegador/OS.
+       Manter a área de input com flex-shrink: 0 e a área de mensagens com flex-grow: 1
+       e overflow:auto é a abordagem CSS mais comum.
+       Se o teclado virtual "empurrar" o layout para cima, e a altura da viewport
+       diminuir, o flexbox deve se reajustar.
+    */
+  }
+}
