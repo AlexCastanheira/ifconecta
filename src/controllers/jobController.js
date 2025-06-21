@@ -1,3 +1,5 @@
+// src/controllers/jobController.js
+
 import prisma from "../config/prismaClient.js";
 import { createNotification, sendNotificationEmail, notifyNewJob, notifyNewApplication } from "../models/notification.js";
 
@@ -68,58 +70,153 @@ export const renderEditJobForm = async (req, res) => {
 export const renderJobsList = async (req, res) => {
   try {
     const filter = req.query.filter || "open";
+    const page = Number.parseInt(req.query.page) || 1;
+    const limit = Number.parseInt(req.query.limit) || 10;
+    const search = req.query.search || '';
+    const contractType = req.query.contractType || '';
+    const requirement = req.query.requirement || '';
+
+    const skip = (page - 1) * limit;
 
     const isEmployer = req.session.user && req.session.user.type.toLowerCase() === "employer";
     const isStudent = req.session.user && req.session.user.type.toLowerCase() === "student";
+
+    // Inicia um array para as condições AND
+    let conditions = [];
+
+    // Adiciona o filtro de tipo de contrato
+    if (contractType) {
+      conditions.push({ contractType: contractType });
+    }
+
+    // Adiciona o filtro de requisito (Badge)
+    if (requirement) {
+      conditions.push({
+        requirements: {
+          some: {
+            name: requirement // Agora o nome vem com a capitalização correta do EJS
+          }
+        }
+      });
+    }
+
+    // Adiciona a condição de pesquisa geral
+    if (search) {
+      const searchOrConditions = [
+        { title: { contains: search } },
+        { description: { contains: search } },
+        { employer: { name: { contains: search } } },
+        { requirements: { some: { name: { contains: search } } } }
+      ];
+      conditions.push({ OR: searchOrConditions });
+    }
+
+    // Adiciona o filtro de status da vaga (exceto se for "all")
+    if (filter === "open") {
+      conditions.push({ status: true });
+    } else if (filter === "closed") {
+      conditions.push({ status: false });
+    }
+
     let jobs = [];
-    let myApplications = [];
+    let totalJobs = 0;
+
+    // Define a cláusula WHERE final
+    let finalWhereClause = conditions.length > 0 ? { AND: conditions } : {};
 
     if (isEmployer) {
+      finalWhereClause.employerId = req.session.user.id; // Garante que é do próprio empregador
+
       jobs = await prisma.job.findMany({
-        where: {
-          employerId: req.session.user.id,
-        },
+        where: finalWhereClause,
         include: {
           employer: true,
           requirements: true,
           applications: true,
         },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
       });
-    } else {
-      const whereClause = {};
+      totalJobs = await prisma.job.count({ where: finalWhereClause });
+    } else if (isStudent && filter === "applied") {
+      // Para o filtro 'applied', a lógica precisa ser um pouco diferente,
+      // pois os filtros e pesquisa se aplicam à vaga relacionada à aplicação.
+      let applicationWhereClause = {
+        studentId: req.session.user.id,
+      };
 
-      if (filter === "open") {
-        whereClause.status = true;
-      } else if (filter === "closed") {
-        whereClause.status = false;
+      let jobConditionsForApplied = [];
+
+      if (contractType) {
+        jobConditionsForApplied.push({ contractType: contractType });
+      }
+      if (requirement) {
+        jobConditionsForApplied.push({ requirements: { some: { name: requirement } } });
+      }
+      if (search) {
+        jobConditionsForApplied.push({
+          OR: [
+            { title: { contains: search } },
+            { description: { contains: search } },
+            { employer: { name: { contains: search } } },
+            { requirements: { some: { name: { contains: search } } } }
+          ]
+        });
+      }
+      // O status da vaga não se aplica diretamente ao filtro "applied" aqui,
+      // pois queremos ver todas as candidaturas, independentemente do status atual da vaga
+      // a menos que o filtro "open" ou "closed" seja aplicado DENTRO das vagas aplicadas,
+      // o que não está na lógica atual, mas é uma consideração futura.
+
+      if (jobConditionsForApplied.length > 0) {
+        applicationWhereClause.job = { AND: jobConditionsForApplied };
       }
 
+      const myApplications = await prisma.jobApplication.findMany({
+        where: applicationWhereClause,
+        include: {
+          job: {
+            include: {
+              employer: true,
+              requirements: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
+      });
+
+      jobs = myApplications.map((app) => app.job);
+
+      const totalApplications = await prisma.jobApplication.count({
+        where: applicationWhereClause
+      });
+      totalJobs = totalApplications;
+
+    } else { // Para estudantes (que não estão em 'applied') e usuários não logados
+      // A finalWhereClause já contém as condições de status "open"/"closed" (se aplicáveis)
+      // e os outros filtros.
       jobs = await prisma.job.findMany({
-        where: whereClause,
+        where: finalWhereClause,
         include: {
           employer: true,
           requirements: true,
         },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
       });
-
-      if (isStudent && filter === "applied") {
-        myApplications = await prisma.jobApplication.findMany({
-          where: {
-            studentId: req.session.user.id,
-          },
-          include: {
-            job: {
-              include: {
-                employer: true,
-                requirements: true,
-              },
-            },
-          },
-        });
-
-        jobs = myApplications.map((app) => app.job);
-      }
+      totalJobs = await prisma.job.count({ where: finalWhereClause });
     }
+
+    const totalPages = Math.ceil(totalJobs / limit);
+
+    // Buscar todas as badges disponíveis para o filtro de requisitos
+    const allBadges = await prisma.badge.findMany({
+      orderBy: { name: "asc" },
+    });
 
     res.render("jobsList", {
       jobs,
@@ -128,16 +225,30 @@ export const renderJobsList = async (req, res) => {
       isStudent: isStudent,
       user: req.session.user || null,
       filter: filter,
+      currentPage: page,
+      totalPages: totalPages,
+      limit: limit,
+      search: search,
+      contractType: contractType,
+      requirement: requirement,
+      availableRequirements: allBadges,
     });
   } catch (err) {
-    console.error(err);
+    console.error("Erro ao carregar vagas:", err);
     res.status(500).render("jobsList", {
       jobs: [],
       error: "Erro ao carregar vagas.",
       isEmployer: req.session.user && req.session.user.type.toLowerCase() === "employer",
       isStudent: req.session.user && req.session.user.type.toLowerCase() === "student",
       user: req.session.user || null,
-      filter: "open",
+      filter: req.query.filter || "open",
+      currentPage: 1,
+      totalPages: 1,
+      limit: 10,
+      search: '',
+      contractType: '',
+      requirement: '',
+      availableRequirements: [],
     });
   }
 };
@@ -543,6 +654,10 @@ export const updateApplicationStatus = async (req, res) => {
 export const cancelApplication = async (req, res) => {
   const applicationId = Number.parseInt(req.params.id);
   const studentId = req.session.user.id;
+
+  if (req.session.user.type.toLowerCase() !== "student") {
+    return res.status(403).json({ message: "Apenas estudantes podem cancelar candidaturas." });
+  }
 
   try {
     const application = await prisma.jobApplication.findUnique({

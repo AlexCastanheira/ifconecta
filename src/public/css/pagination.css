@@ -1,0 +1,194 @@
+/* src/public/css/pagination.css - NOVO ARQUIVO PARA ESTILOS DE PAGINAÇÃO E BUSCA/FILTROS */
+
+/* --- Estilos para a Seção de Busca e Filtros --- */
+.search-and-filters {
+    display: flex;
+    flex-wrap: wrap;
+    /* Permite que os itens quebrem linha */
+    gap: var(--spacing-unit);
+    /* Espaçamento entre o input de busca e os filtros */
+    align-items: center;
+    /* Alinha verticalmente */
+    margin-bottom: calc(var(--spacing-unit) * 1.5);
+    /* Adiciona margem abaixo da seção */
+}
+
+/* Estilos para o campo de busca */
+.input-search {
+    flex-grow: 1;
+    /* Permite que o campo de busca ocupe o espaço disponível */
+    min-width: 200px;
+    /* Largura mínima para o campo de busca */
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--border-radius-default);
+    font-size: 1rem;
+    color: var(--color-secondary-dark);
+    /* Cor de texto */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    /* Transição para foco */
+}
+
+.input-search:focus {
+    border-color: var(--color-accent-blue);
+    box-shadow: 0 0 0 3px rgba(var(--color-accent-blue-rgb), 0.2);
+    outline: none;
+}
+
+/* Container para os selects de filtro */
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    /* Espaçamento entre os selects de filtro */
+}
+
+/* Estilo para todos os selects de filtro dentro de .filters */
+.filters .input {
+    padding: 0.8rem 1rem;
+    /* Padding para os selects */
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--border-radius-default);
+    font-size: 1rem;
+    color: var(--color-secondary-dark);
+    background-color: var(--color-background-card);
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.filters .input:hover {
+    border-color: var(--color-text-light);
+}
+
+.filters .input:focus {
+    border-color: var(--color-accent-blue);
+    box-shadow: 0 0 0 3px rgba(var(--color-accent-blue-rgb), 0.2);
+    outline: none;
+}
+
+
+/* --- Estilos para Paginação --- */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: calc(var(--spacing-unit) * 2);
+    padding-bottom: calc(var(--spacing-unit) * 2);
+}
+
+.pagination-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 38px;
+    /* Largura mínima para botões de número */
+    padding: 8px 12px;
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--border-radius-default-small);
+    background-color: var(--color-background-card);
+    color: var(--color-accent-blue);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.pagination-link:hover:not(.disabled):not(.active) {
+    background-color: var(--color-hover-light);
+    border-color: var(--color-accent-blue-light);
+    color: var(--color-accent-blue-darker);
+}
+
+.pagination-link.active {
+    background-color: var(--color-accent-blue);
+    color: white;
+    border-color: var(--color-accent-blue);
+    cursor: default;
+    box-shadow: var(--box-shadow-small);
+}
+
+.pagination-link.disabled {
+    background-color: #f0f0f0;
+    color: #ccc;
+    border-color: #ddd;
+    cursor: not-allowed;
+}
+
+/* Estilo específico para a paginação de candidaturas dentro de jobDetails */
+.job-applications-pagination {
+    margin-top: calc(var(--spacing-unit) * 1.5);
+    /* Mais próximo da lista de candidatos */
+    padding-bottom: 0;
+    /* Não precisa de padding extra no final, já tem no container principal */
+}
+
+/* --- Mensagens de Alerta (Caso não estejam definidas globalmente em styles.css) --- */
+.alert {
+    padding: var(--spacing-unit);
+    margin-bottom: var(--spacing-unit);
+    border-radius: var(--border-radius-default);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.alert-info {
+    background-color: #e0f7fa;
+    /* Light blue */
+    color: #007bbd;
+    /* Darker blue */
+    border: 1px solid #b2ebf2;
+}
+
+.alert-danger {
+    background-color: #fbe9e9;
+    /* Light red */
+    color: #c0392b;
+    /* Darker red */
+    border: 1px solid #f2dcdc;
+}
+
+/* --- Responsividade para os elementos de busca/filtro/paginação --- */
+@media (max-width: 768px) {
+
+    /* Ajustes para a seção de busca e filtros em telas pequenas */
+    .search-and-filters {
+        flex-direction: column;
+        align-items: stretch;
+        /* Estica os itens para ocupar a largura total */
+    }
+
+    /* Ajustes para o campo de busca em telas pequenas */
+    .input-search {
+        width: 100%;
+        /* Ocupa a largura total */
+        min-width: unset;
+        /* Remove largura mínima */
+    }
+
+    /* Ajustes para o container de filtros em telas pequenas */
+    .filters {
+        flex-direction: column;
+        gap: var(--spacing-unit);
+        /* Espaçamento entre os selects empilhados */
+    }
+
+    /* Ajustes para os selects de filtro em telas pequenas */
+    .filters .input {
+        width: 100%;
+        /* Ocupa a largura total */
+    }
+
+    /* Ajustes para o container de paginação em telas pequenas */
+    .pagination-container {
+        flex-wrap: wrap;
+        /* Permite que os links de paginação quebrem linha */
+        justify-content: flex-start;
+        /* Alinha à esquerda */
+    }
+
+    /* Ajustes para os links de paginação em telas pequenas */
+    .pagination-link {
+        flex-grow: 1;
+        /* Permite que os botões se expandam para ocupar o espaço */
+    }
+}
